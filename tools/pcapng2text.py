@@ -35,14 +35,23 @@ def main():
               'will be printed out.'))
 
     parser.add_argument(
+        '--retag_urbs', action='store_true', dest='retag_urbs',
+        help=('Apply new, unique tags to the URBs when converting to text '
+              'format. This works around the lack of unique keys in the '
+              'captures.'))
+    parser.add_argument(
+        '--noretag_urbs', action='store_false', dest='retag_urbs',
+        help='Keep original URB tags on the capture.')
+
+    parser.add_argument(
         'pcap_file', action='store', type=str,
         help='Path to the pcapng file with the USB capture.')
 
     args = parser.parse_args()
 
-    capfile = usbmon.pcapng.File(args.pcap_file)
+    capfile = usbmon.pcapng.File(args.pcap_file, args.retag_urbs)
     capfile.parse()
-    for packet in capfile.packets:
+    for packet in capfile.session.in_order():
         if not packet.address.startswith(args.addr_prefix):
             continue
         print(str(packet))

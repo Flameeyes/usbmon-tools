@@ -20,15 +20,16 @@
 import pcapng
 
 import usbmon.structs
+import usbmon.capture_session
 
 
 class File:
     """A pcapng file containing an USB capture.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, retag_urbs=True):
         self._path = path
-        self.packets = []
+        self.session = usbmon.capture_session.Session(retag_urbs)
 
     def parse(self):
         with open(self._path, 'rb') as pcap_file:
@@ -43,9 +44,7 @@ class File:
                             f"found {block.link_type_description}.")
                 elif isinstance(block, pcapng.blocks.EnhancedPacket):
                     assert block.interface_id == 0
-                    self._parse_block(block.packet_payload_info)
-
-    def _parse_block(self, payload):
-        self.packets.append(
-            usbmon.structs.Packet.from_bytes(
-                self.endianness, payload[2]))
+                    _, _, payload = block.packet_payload_info
+                    self.session.add(
+                        usbmon.structs.Packet.from_bytes(
+                            self.endianness, payload))
