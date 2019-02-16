@@ -36,32 +36,28 @@ class Session:
         self._submitted_packets = {}
         self._retag_urbs = retag_urbs
 
-    def _append(self, submission, callback):
+    def _append(self, first, second):
         if self._retag_urbs:
             # Totally random UUID, is more useful than the original URB ID.  We
             # take the hex string format, because that complies with the usbmon
             # documentation, without risking parsing errors due to dashes.
             tag = uuid.uuid4().hex
-            if submission is not None:
-                submission.tag = tag
-            if callback is not None:
-                callback.tag = tag
-        self._packet_pairs.append((submission, callback))
+            first.tag = tag
+            if second is not None:
+                second.tag = tag
+        self._packet_pairs.append((first, second))
 
     def add(self, packet):
-        if packet.type == structs.PacketType.SUBMISSION:
-            # Check first if there's already a submission with the same ID. This
-            # should never happen but it can happen if there is a corrupted
-            # capture file. If there is a stale capture, append it as such.
-            stale_submission = self._submitted_packets.get(packet.tag, None)
-            if stale_submission is not None:
-                logging.debug('Found stale submission for URB %s', packet.tg)
-                self._append(stale_submission, None)
+        """Add a packet to the session, matching with its previous event."""
 
-            self._submitted_packets[packet.tag] = packet
+        # Events can be in either S;E, S;C, or C;S order. So we just keep a
+        # "previous" packet for each tag, and once we matched two we reset the
+        # URB.
+        if packet.tag in self._submitted_packets:
+            first = self._submitted_packets.pop(packet.tag)
+            self._append(first, packet)
         else:
-            submission = self._submitted_packets.pop(packet.tag, None)
-            self._append(submission, packet)
+            self._submitted_packets[packet.tag] = packet
 
     def in_order(self):
         """Yield the packets in their timestamp order."""
