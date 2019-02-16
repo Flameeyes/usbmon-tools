@@ -100,7 +100,11 @@ class Packet:
         return Packet(_usbmon_structure(endianness).parse(raw_packet))
 
     def __init__(self, constructed_object):
-        self.urb_id = constructed_object.id
+        # The binary ID value is usually a pointer in memory. Keep the text
+        # representation instead, because it should be considered an opaque
+        # value.
+        self.tag = f'{constructed_object.id:08x}'
+
         self.type = constructed_object.type
 
         self.xfer_type = XferType(constructed_object.xfer_type)
@@ -161,7 +165,7 @@ class Packet:
             return value
 
     def __repr__(self):
-        return f'Packet<id: {self.urb_id:08x} address: {self.address!r} payload: {self.payload!r}>'
+        return f'Packet<tag: {self.tag} address: {self.address!r} payload: {self.payload!r}>'
 
     def __str__(self):
         # Try to keep compatibility with Linux usbmon's formatting,
@@ -169,6 +173,6 @@ class Packet:
         payload_string = re.sub(r'(.{8})', r'\1 ', self.payload.hex())
         
         return (
-            f'{self.urb_id:08x} {self.timestamp.timestamp() * 1e6:.0f} '
+            f'{self.tag} {self.timestamp.timestamp() * 1e6:.0f} '
             f'{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} '
             f'{self.setup_packet_string} {len(self.payload)} {self.flag_data} {payload_string}')
