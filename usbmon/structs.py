@@ -22,12 +22,20 @@ import re
 
 import construct
 
+class PacketType(enum.Enum):
+    SUBMISSION = 'S'
+    CALLBACK = 'C'
+    ERROR = 'E'
+
+
 def _usbmon_structure(endianness):
     """Return a construct.Struct() object suitable to parse a usbmon packet."""
     
     return construct.Struct(
         'id' / construct.FormatField(endianness, 'Q'),
-        'type' / construct.PaddedString(1, 'ascii'),
+        'type' / construct.Mapping(
+            construct.Byte,
+            {e: ord(e.value) for e in PacketType}),
         'xfer_type' / construct.Byte,
         'epnum' / construct.Byte,
         'devnum' / construct.Byte,
@@ -162,5 +170,5 @@ class Packet:
         
         return (
             f'{self.urb_id:08x} {self.timestamp.timestamp() * 1e6:.0f} '
-            f'{self.type} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} '
+            f'{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} '
             f'{self.setup_packet_string} {len(self.payload)} {self.flag_data} {payload_string}')
