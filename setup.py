@@ -48,6 +48,5 @@ setup(
         'construct>=2.9',
         'python-pcapng',
     ],
-    tests_require = test_required,
 )
 
