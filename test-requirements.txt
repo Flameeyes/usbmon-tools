@@ -1,5 +1,5 @@
 absl-py
 construct>=2.9
--e git+https://github.com/rshk/python-pcapng#egg=python-pcapng
+git+https://github.com/rshk/python-pcapng#egg=python-pcapng
 pytest>=3.6.0
 pytest-timeout>=1.3.0
