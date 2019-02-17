@@ -44,8 +44,8 @@ setup(
     packages = find_packages(
         exclude=['test'],
     ),
-    install_require = [
-        'construct',
+    install_requires = [
+        'construct>=2.9',
         'python-pcapng',
     ],
     tests_require = test_required,
