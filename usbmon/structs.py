@@ -182,4 +182,4 @@ class Packet:
         return (
             f'{self.tag} {self.timestamp.timestamp() * 1e6:.0f} '
             f'{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} '
-            f'{self.setup_packet_string} {self.length} {self.flag_data} {payload_string}')
+            f'{self.setup_packet_string} {self.length} {self.flag_data} {payload_string}').rstrip()
