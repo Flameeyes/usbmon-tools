@@ -11,4 +11,4 @@ install:
 script:
   - py.test
   - python setup.py bdist_wheel
-  - pip install ./dist/usbmon-tools-*.whl
+  - pip install ./dist/usbmon_tools-*.whl
