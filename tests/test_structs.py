@@ -18,6 +18,7 @@
 """Tests for usbmon.structs."""
 
 import binascii
+import errno
 
 from absl.testing import absltest
 
@@ -38,6 +39,10 @@ _CONTROL_S_BASE64 = (
 _CONTROL_C_BASE64 = (
     'AKrN2gAAAABDAoABAQAtAMUvaFwAAAAAX9MBAAAAAAASAAAAEgAAAAAAAAAAAAAAAAAAAAAAAA'
     'AAAgAAAAAAABIBAAIJAAFAax0CABQEAwIBAQ==')
+
+_STATUS_ENOENT_BASE64 = (
+    'wBxJFw2g//9DAYFCAQAtAFyjT1wAAAAAINEMAP7///8AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAA'
+    'AAAgAAAAAAAA==')
 
 
 class TestPacket(absltest.TestCase):
@@ -69,3 +74,18 @@ class TestPacket(absltest.TestCase):
         self.assertEqual(
             'dacdaa00 1550331845119647 C Ci:1:001:0 0 18 = 12010002 09000140 6b1d0200 14040302 0101',
             str(packet))
+
+    def test_status_error_enoent(self):
+        packet = usbmon.structs.Packet.from_bytes(
+            '<', binascii.a2b_base64(_STATUS_ENOENT_BASE64))
+        self.assertEqual('ENOENT', packet.error)
+
+    def test_status_error_interrupt_c(self):
+        packet = usbmon.structs.Packet.from_bytes(
+            '<', binascii.a2b_base64(_INTERRUPT_C_BASE64))
+        self.assertIsNone(packet.error)
+
+    def test_status_error_interrupt_s(self):
+        packet = usbmon.structs.Packet.from_bytes(
+            '<', binascii.a2b_base64(_INTERRUPT_S_BASE64))
+        self.assertEqual('EINPROGRESS', packet.error)

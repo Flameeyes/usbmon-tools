@@ -21,6 +21,7 @@ import enum
 import re
 
 import construct
+import errno
 
 class PacketType(enum.Enum):
     SUBMISSION = 'S'
@@ -142,6 +143,17 @@ class Packet:
             self.direction = Direction.IN
         else:
             self.direction = Direction.OUT
+
+    @property
+    def error(self):
+        """Returns a standard errno symbol for error status."""
+        if self.status < 0:
+            try:
+                return errno.errorcode[abs(self.status)]
+            except LookupError:
+                return self.status
+        else:
+            return None
 
     @property
     def address(self):
