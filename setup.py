@@ -21,6 +21,9 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
+with open('test-requirements.txt') as requirements:
+    test_required = requirements.read().splitlines()
+
 setup(
     name = 'usbmon-tools',
     version = '1',
@@ -45,5 +48,6 @@ setup(
         'construct',
         'python-pcapng',
     ],
+    tests_require = test_required,
 )
 

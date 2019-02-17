@@ -1,0 +1,3 @@
+absl-py
+pytest>=3.6.0
+pytest-timeout>=1.3.0
