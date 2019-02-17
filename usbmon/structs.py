@@ -159,7 +159,14 @@ class Packet:
                 f'{self.setup_packet.wValue:04x} {self.setup_packet.wIndex:04x} '
                 f'{self.setup_packet.wLength:04x}')
         else:
-            value = f'{self.status}'
+            if self.xfer_type == XferType.INTERRUPT:
+                value = f'{self.status}:{self.interval}'
+            elif self.xfer_type == XferType.ISOCHRONOUS:
+                value = f'{self.status}:{self.interval}:{self.start_frame}'
+                if self.type != PacketType.SUBMISSION:
+                    value += f':{self.error_count}'
+            else:
+                value = f'{self.status}'
             if self.flag_setup == '-':
                 value += ' __ __ ____ ____ ____'
             return value
