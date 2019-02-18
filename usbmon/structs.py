@@ -127,10 +127,15 @@ class Packet:
             constructed_object.ts_sec + (1e-6 * constructed_object.ts_usec))
         self.status = constructed_object.status
         self.length = constructed_object.length
-        # self.error_count = constructed_object.s.iso.error_count
-        # self.numdesc = constructed_object.s.iso.numdesc
-        self.interval = constructed_object.interval
-        self.start_frame = constructed_object.start_frame
+
+        if self.xfer_type in (XferType.INTERRUPT, XferType.ISOCHRONOUS):
+            self.interval = constructed_object.interval
+
+        if self.xfer_type == XferType.ISOCHRONOUS:
+            self.error_count = constructed_object.s.iso.error_count
+            self.numdesc = constructed_object.s.iso.numdesc
+            self.start_frame = constructed_object.start_frame
+
         self.xfer_flags = constructed_object.xfer_flags
         self.ndesc = constructed_object.ndesc
         self.payload = constructed_object.payload
