@@ -30,6 +30,13 @@ class PacketType(enum.Enum):
     ERROR = 'E'
 
 
+class XferType(enum.Enum):
+    ISOCHRONOUS = 0
+    INTERRUPT = 1
+    CONTROL = 2
+    BULK = 3
+
+
 def _usbmon_structure(endianness):
     """Return a construct.Struct() object suitable to parse a usbmon packet."""
 
@@ -38,7 +45,9 @@ def _usbmon_structure(endianness):
         'type' / construct.Mapping(
             construct.Byte,
             {e: ord(e.value) for e in PacketType}),
-        'xfer_type' / construct.Byte,
+        'xfer_type' / construct.Mapping(
+            construct.Byte,
+            {e: e.value for e in XferType}),
         'epnum' / construct.Byte,
         'devnum' / construct.Byte,
         'busnum' / construct.FormatField(endianness, 'H'),
@@ -79,13 +88,6 @@ class Direction(enum.Enum):
     IN = 'i'
 
 
-class XferType(enum.Enum):
-    ISOCHRONOUS = 0
-    INTERRUPT = 1
-    CONTROL = 2
-    BULK = 3
-
-
 _XFERTYPE_TO_MNEMONIC = {
     XferType.ISOCHRONOUS: 'Z',
     XferType.INTERRUPT: 'I',
@@ -109,7 +111,7 @@ class Packet:
 
         self.type = constructed_object.type
 
-        self.xfer_type = XferType(constructed_object.xfer_type)
+        self.xfer_type = constructed_object.xfer_type
 
         self.devnum = constructed_object.devnum
         self.busnum = constructed_object.busnum
