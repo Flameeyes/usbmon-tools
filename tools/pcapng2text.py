@@ -49,9 +49,8 @@ def main():
 
     args = parser.parse_args()
 
-    capfile = usbmon.pcapng.File(args.pcap_file, args.retag_urbs)
-    capfile.parse()
-    for packet in capfile.session.in_order():
+    session = usbmon.pcapng.parse_file(args.pcap_file, args.retag_urbs)
+    for packet in session:
         if not packet.address.startswith(args.addr_prefix):
             continue
         print(str(packet))

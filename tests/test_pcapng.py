@@ -27,9 +27,8 @@ import usbmon.pcapng
 class PcapTest(absltest.TestCase):
 
     def test_parse(self):
-        capfile = usbmon.pcapng.File(
+        session = usbmon.pcapng.parse_file(
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
                 'testdata/test1.pcap'))
-        capfile.parse()
-        self.assertLen(list(capfile.session.in_order()), 16)
+        self.assertLen(list(session), 16)
