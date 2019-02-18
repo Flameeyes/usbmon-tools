@@ -88,6 +88,17 @@ class SetupType(enum.Enum):
     RESERVED = 3
 
 
+class SetupStandardRequests(enum.Enum):
+    GET_STATUS = 0x00
+    CLEAR_FEATURE = 0x01
+    SET_FEATURE = 0x03
+    SET_ADDRESS = 0x05
+    GET_DESCRIPTOR = 0x06
+    SET_DESCRIPTOR = 0x07
+    GET_CONFIGURATION = 0x08
+    SET_CONFIGURATION = 0x09
+
+
 class SetupRecipient(enum.Enum):
     DEVICE = 0
     INTERFACE = 1
