@@ -25,6 +25,8 @@ from typing import Union
 import construct
 import hexdump
 
+from usbmon import setup
+
 
 class PacketType(enum.Enum):
     SUBMISSION = 'S'
@@ -76,58 +78,6 @@ def _usbmon_structure(endianness):
     )
 
 
-class SetupDirection(enum.Enum):
-    HOST_TO_DEVICE = 0
-    DEVICE_TO_HOST = 1
-
-
-class SetupType(enum.Enum):
-    STANDARD = 0
-    CLASS = 1
-    VENDOR = 2
-    RESERVED = 3
-
-
-class SetupStandardRequests(enum.Enum):
-    GET_STATUS = 0x00
-    CLEAR_FEATURE = 0x01
-    SET_FEATURE = 0x03
-    SET_ADDRESS = 0x05
-    GET_DESCRIPTOR = 0x06
-    SET_DESCRIPTOR = 0x07
-    GET_CONFIGURATION = 0x08
-    SET_CONFIGURATION = 0x09
-
-
-class SetupRecipient(enum.Enum):
-    DEVICE = 0
-    INTERFACE = 1
-    ENDPOINT = 2
-    OTHER = 3
-    RESERVED = 4
-
-
-_USB_SETUP_PACKET = construct.Struct(
-    'bmRequestType' / construct.Union(
-        0,
-        'values' / construct.BitStruct(
-            'direction' / construct.Mapping(
-                construct.BitsInteger(1),
-                {e: e.value for e in SetupDirection}),
-            'type' / construct.Mapping(
-                construct.BitsInteger(2),
-                {e: e.value for e in SetupType}),
-            'recipient' / construct.Mapping(
-                construct.BitsInteger(5),
-                {e: e.value for e in SetupRecipient}),
-        ),
-        'raw' / construct.Byte,
-    ),
-    'bRequest' / construct.Byte,
-    'wValue' / construct.Int16ul,
-    'wIndex' / construct.Int16ul,
-    'wLength' / construct.Int16ul,
-)
 
 
 class Direction(enum.Enum):
@@ -165,7 +115,7 @@ class Packet:
 
         self.flag_setup = constructed_object.flag_setup
         if self.flag_setup == 0:
-            self.setup_packet = _USB_SETUP_PACKET.parse(constructed_object.s.setup)
+            self.setup_packet = setup.SetupPacket(constructed_object.s.setup)
         else:  # No setup for this kind of URB, or unable to capture setup packet.
             self.setup_packet = None
 
@@ -221,10 +171,7 @@ class Packet:
     @property
     def setup_packet_string(self) -> str:
         if self.setup_packet:
-            return (
-                f's {self.setup_packet.bmRequestType.raw:02x} {self.setup_packet.bRequest:02x} '
-                f'{self.setup_packet.wValue:04x} {self.setup_packet.wIndex:04x} '
-                f'{self.setup_packet.wLength:04x}')
+            return str(self.setup_packet)
         else:
             if self.xfer_type == XferType.INTERRUPT:
                 value = f'{self.status}:{self.interval}'
