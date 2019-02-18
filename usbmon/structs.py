@@ -18,11 +18,13 @@
 
 import datetime
 import enum
+import errno
 import re
 from typing import Union
 
 import construct
-import errno
+import hexdump
+
 
 class PacketType(enum.Enum):
     SUBMISSION = 'S'
@@ -195,9 +197,9 @@ class Packet:
         return f'Packet<tag: {self.tag} address: {self.address!r} payload: {self.payload!r}>'
 
     def __str__(self) -> str:
-        # Try to keep compatibility with Linux usbmon's formatting,
-        # which annoyingly seems to cut this at 4-bytes groups.
-        payload_string = re.sub(r'(.{8})', r'\1 ', self.payload.hex())
+        # Try to keep compatibility with Linux usbmon's formatting, which
+        # annoyingly seems to cut this at 4-bytes groups.
+        payload_string = hexdump.dump(self.payload, size=8).lower()
 
         return (
             f'{self.tag} {self.timestamp.timestamp() * 1e6:.0f} '
