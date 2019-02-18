@@ -27,11 +27,11 @@ class File:
     """A pcapng file containing an USB capture.
     """
 
-    def __init__(self, path, retag_urbs=True):
+    def __init__(self, path: str, retag_urbs: bool = True):
         self._path = path
         self.session = usbmon.capture_session.Session(retag_urbs)
 
-    def parse(self):
+    def parse(self) -> None:
         with open(self._path, 'rb') as pcap_file:
             scanner = pcapng.FileScanner(pcap_file)
             for block in scanner:

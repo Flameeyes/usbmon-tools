@@ -1,13 +1,13 @@
 # python
 #
 # Copyright 2019 The usbmon-tools Authors
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     https://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@
 import datetime
 import enum
 import re
+from typing import Union
 
 import construct
 import errno
@@ -31,7 +32,7 @@ class PacketType(enum.Enum):
 
 def _usbmon_structure(endianness):
     """Return a construct.Struct() object suitable to parse a usbmon packet."""
-    
+
     return construct.Struct(
         'id' / construct.FormatField(endianness, 'Q'),
         'type' / construct.Mapping(
@@ -97,7 +98,7 @@ _XFERTYPE_TO_MNEMONIC = {
 class Packet:
 
     @staticmethod
-    def from_bytes(endianness, raw_packet):
+    def from_bytes(endianness: str, raw_packet: bytes) -> 'Packet':
         return Packet(_usbmon_structure(endianness).parse(raw_packet))
 
     def __init__(self, constructed_object):
@@ -109,7 +110,7 @@ class Packet:
         self.type = constructed_object.type
 
         self.xfer_type = XferType(constructed_object.xfer_type)
-        
+
         self.devnum = constructed_object.devnum
         self.busnum = constructed_object.busnum
 
@@ -122,7 +123,7 @@ class Packet:
         self.flag_data = constructed_object.flag_data
         if not self.flag_data:
             self.flag_data = '='
-        
+
         self.timestamp = datetime.datetime.fromtimestamp(
             constructed_object.ts_sec + (1e-6 * constructed_object.ts_usec))
         self.status = constructed_object.status
@@ -150,7 +151,7 @@ class Packet:
             self.direction = Direction.OUT
 
     @property
-    def error(self):
+    def error(self) -> Union[str, int, None]:
         """Returns a standard errno symbol for error status."""
         if self.status < 0:
             try:
@@ -161,15 +162,15 @@ class Packet:
             return None
 
     @property
-    def address(self):
+    def address(self) -> str:
         return f'{self.busnum}.{self.devnum}.{self.endpoint}'
 
     @property
-    def type_mnemonic(self):
+    def type_mnemonic(self) -> str:
         return _XFERTYPE_TO_MNEMONIC[self.xfer_type]
 
     @property
-    def setup_packet_string(self):
+    def setup_packet_string(self) -> str:
         if self.setup_packet:
             return (
                 f's {self.setup_packet.bmRequestType:02x} {self.setup_packet.bRequest:02x} '
@@ -188,14 +189,14 @@ class Packet:
                 value += ' __ __ ____ ____ ____'
             return value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Packet<tag: {self.tag} address: {self.address!r} payload: {self.payload!r}>'
 
-    def __str__(self):
+    def __str__(self) -> str:
         # Try to keep compatibility with Linux usbmon's formatting,
         # which annoyingly seems to cut this at 4-bytes groups.
         payload_string = re.sub(r'(.{8})', r'\1 ', self.payload.hex())
-        
+
         return (
             f'{self.tag} {self.timestamp.timestamp() * 1e6:.0f} '
             f'{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} '

@@ -1,13 +1,13 @@
 # python
 #
 # Copyright 2019 The usbmon-tools Authors
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     https://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,24 +19,27 @@
 
 import itertools
 import logging
+from typing import Dict, Generator, List, Optional, Tuple
 import uuid
 
 from usbmon import structs
 
+_PacketPair = Tuple[structs.Packet, Optional[structs.Packet]]
+
 
 class Session:
 
-    def __init__(self, retag_urbs=True):
+    def __init__(self, retag_urbs: bool = True):
         """Initialize the capture session.
-        
+
         Args:
           retag_urbs: Whether to replace URB tags with new UUIDs.
         """
-        self._packet_pairs = []
-        self._submitted_packets = {}
-        self._retag_urbs = retag_urbs
+        self._packet_pairs = []  # type: List[_PacketPair]
+        self._submitted_packets = {}  # type: Dict[str, structs.Packet]
+        self._retag_urbs = retag_urbs  # type: bool
 
-    def _append(self, first, second):
+    def _append(self, first: structs.Packet, second: Optional[structs.Packet]):
         if self._retag_urbs:
             # Totally random UUID, is more useful than the original URB ID.  We
             # take the hex string format, because that complies with the usbmon
@@ -47,7 +50,7 @@ class Session:
                 second.tag = tag
         self._packet_pairs.append((first, second))
 
-    def add(self, packet):
+    def add(self, packet: structs.Packet):
         """Add a packet to the session, matching with its previous event."""
 
         # Events can be in either S;E, S;C, or C;S order. So we just keep a
@@ -59,14 +62,14 @@ class Session:
         else:
             self._submitted_packets[packet.tag] = packet
 
-    def in_order(self):
+    def in_order(self) -> Generator[structs.Packet, None, None]:
         """Yield the packets in their timestamp order."""
         yield from sorted(
             filter(None, itertools.chain(*self._packet_pairs)),
             key=lambda x: x.timestamp)
 
-    def in_pairs(self):
+    def in_pairs(self) -> Generator[_PacketPair, None, None]:
         yield from self._packet_pairs
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[structs.Packet, None, None]:
         return self.in_order()
