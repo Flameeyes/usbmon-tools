@@ -3,3 +3,4 @@ construct>=2.9
 git+https://github.com/rshk/python-pcapng#egg=python-pcapng
 pytest>=3.6.0
 pytest-timeout>=1.3.0
+mypy

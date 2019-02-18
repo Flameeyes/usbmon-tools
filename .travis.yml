@@ -10,5 +10,6 @@ install:
 
 script:
   - py.test
+  - mypy
   - python setup.py bdist_wheel
   - pip install ./dist/usbmon_tools-*.whl
