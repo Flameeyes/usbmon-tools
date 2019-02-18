@@ -76,8 +76,42 @@ def _usbmon_structure(endianness):
     )
 
 
+class SetupDirection(enum.Enum):
+    HOST_TO_DEVICE = 0
+    DEVICE_TO_HOST = 1
+
+
+class SetupType(enum.Enum):
+    STANDARD = 0
+    CLASS = 1
+    VENDOR = 2
+    RESERVED = 3
+
+
+class SetupRecipient(enum.Enum):
+    DEVICE = 0
+    INTERFACE = 1
+    ENDPOINT = 2
+    OTHER = 3
+    RESERVED = 4
+
+
 _USB_SETUP_PACKET = construct.Struct(
-    'bmRequestType' / construct.Byte,
+    'bmRequestType' / construct.Union(
+        0,
+        'values' / construct.BitStruct(
+            'direction' / construct.Mapping(
+                construct.BitsInteger(1),
+                {e: e.value for e in SetupDirection}),
+            'type' / construct.Mapping(
+                construct.BitsInteger(2),
+                {e: e.value for e in SetupType}),
+            'recipient' / construct.Mapping(
+                construct.BitsInteger(5),
+                {e: e.value for e in SetupRecipient}),
+        ),
+        'raw' / construct.Byte,
+    ),
     'bRequest' / construct.Byte,
     'wValue' / construct.Int16ul,
     'wIndex' / construct.Int16ul,
@@ -177,7 +211,7 @@ class Packet:
     def setup_packet_string(self) -> str:
         if self.setup_packet:
             return (
-                f's {self.setup_packet.bmRequestType:02x} {self.setup_packet.bRequest:02x} '
+                f's {self.setup_packet.bmRequestType.raw:02x} {self.setup_packet.bRequest:02x} '
                 f'{self.setup_packet.wValue:04x} {self.setup_packet.wIndex:04x} '
                 f'{self.setup_packet.wLength:04x}')
         else:
