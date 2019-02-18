@@ -67,3 +67,6 @@ class Session:
 
     def in_pairs(self):
         yield from self._packet_pairs
+
+    def __iter__(self):
+        return self.in_order()
