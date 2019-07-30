@@ -17,6 +17,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import usbmon
+import usbmon.chatter
 import usbmon.pcapng
 
 import argparse
@@ -51,12 +52,12 @@ def main():
             continue
 
         if first.direction == usbmon.constants.Direction.OUT:
-            chatter = first.chatter()
+            packet = first
         else:
-            chatter = second.chatter()
+            packet = second
 
-        if chatter:
-            print(chatter, '\n')
+        if packet.payload:
+            print(usbmon.chatter.dump_packet(packet), '\n')
 
 
 if __name__ == "__main__":
