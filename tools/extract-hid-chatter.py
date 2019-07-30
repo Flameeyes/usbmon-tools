@@ -16,6 +16,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import usbmon
 import usbmon.pcapng
 
 import argparse
@@ -46,10 +47,10 @@ def main():
             # No need to check second, they will be linked.
             continue
 
-        if first.xfer_type != usbmon.structs.XferType.INTERRUPT:
+        if first.xfer_type != usbmon.constants.XferType.INTERRUPT:
             continue
 
-        if first.direction == usbmon.structs.Direction.OUT:
+        if first.direction == usbmon.constants.Direction.OUT:
             chatter = first.chatter()
         else:
             chatter = second.chatter()

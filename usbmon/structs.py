@@ -25,20 +25,8 @@ from typing import Union
 import construct
 import hexdump
 
+from usbmon import constants
 from usbmon import setup
-
-
-class PacketType(enum.Enum):
-    SUBMISSION = 'S'
-    CALLBACK = 'C'
-    ERROR = 'E'
-
-
-class XferType(enum.Enum):
-    ISOCHRONOUS = 0
-    INTERRUPT = 1
-    CONTROL = 2
-    BULK = 3
 
 
 def _usbmon_structure(endianness):
@@ -48,10 +36,10 @@ def _usbmon_structure(endianness):
         'id' / construct.FormatField(endianness, 'Q'),
         'type' / construct.Mapping(
             construct.Byte,
-            {e: ord(e.value) for e in PacketType}),
+            {e: ord(e.value) for e in constants.PacketType}),
         'xfer_type' / construct.Mapping(
             construct.Byte,
-            {e: e.value for e in XferType}),
+            {e: e.value for e in constants.XferType}),
         'epnum' / construct.Byte,
         'devnum' / construct.Byte,
         'busnum' / construct.FormatField(endianness, 'H'),
@@ -78,24 +66,17 @@ def _usbmon_structure(endianness):
     )
 
 
-
-
-class Direction(enum.Enum):
-    OUT = 'o'
-    IN = 'i'
-
-
 _XFERTYPE_TO_MNEMONIC = {
-    XferType.ISOCHRONOUS: 'Z',
-    XferType.INTERRUPT: 'I',
-    XferType.CONTROL: 'C',
-    XferType.BULK: 'B',
+    constants.XferType.ISOCHRONOUS: 'Z',
+    constants.XferType.INTERRUPT: 'I',
+    constants.XferType.CONTROL: 'C',
+    constants.XferType.BULK: 'B',
 }
 
 
 _DIRECTION_TO_PREFIX = {
-    Direction.OUT: 'H>>D ',
-    Direction.IN: 'H<<D ',
+    constants.Direction.OUT: 'H>>D ',
+    constants.Direction.IN: 'H<<D ',
 }
 
 
@@ -134,10 +115,10 @@ class Packet:
         self.status = constructed_object.status
         self.length = constructed_object.length
 
-        if self.xfer_type in (XferType.INTERRUPT, XferType.ISOCHRONOUS):
+        if self.xfer_type in (constants.XferType.INTERRUPT, constants.XferType.ISOCHRONOUS):
             self.interval = constructed_object.interval
 
-        if self.xfer_type == XferType.ISOCHRONOUS:
+        if self.xfer_type == constants.XferType.ISOCHRONOUS:
             self.error_count = constructed_object.s.iso.error_count
             self.numdesc = constructed_object.s.iso.numdesc
             self.start_frame = constructed_object.start_frame
@@ -151,9 +132,9 @@ class Packet:
         # Split the direction from the endpoint
         self.endpoint = constructed_object.epnum & 0x7F
         if constructed_object.epnum & 0x80:
-            self.direction = Direction.IN
+            self.direction = constants.Direction.IN
         else:
-            self.direction = Direction.OUT
+            self.direction = constants.Direction.OUT
 
     @property
     def error(self) -> Union[str, int, None]:
@@ -179,11 +160,11 @@ class Packet:
         if self.setup_packet:
             return str(self.setup_packet)
         else:
-            if self.xfer_type == XferType.INTERRUPT:
+            if self.xfer_type == constants.XferType.INTERRUPT:
                 value = f'{self.status}:{self.interval}'
-            elif self.xfer_type == XferType.ISOCHRONOUS:
+            elif self.xfer_type == constants.XferType.ISOCHRONOUS:
                 value = f'{self.status}:{self.interval}:{self.start_frame}'
-                if self.type != PacketType.SUBMISSION:
+                if self.type != constants.PacketType.SUBMISSION:
                     value += f':{self.error_count}'
             else:
                 value = f'{self.status}'
