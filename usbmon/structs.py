@@ -93,6 +93,12 @@ _XFERTYPE_TO_MNEMONIC = {
 }
 
 
+_DIRECTION_TO_PREFIX = {
+    Direction.OUT: 'H>>D ',
+    Direction.IN: 'H<<D ',
+}
+
+
 
 class Packet:
 
@@ -197,3 +203,12 @@ class Packet:
             f'{self.tag} {self.timestamp.timestamp() * 1e6:.0f} '
             f'{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} '
             f'{self.setup_packet_string} {self.length} {self.flag_data} {payload_string}').rstrip()
+
+    def chatter(self) -> str:
+        """Return a string containing a chatter representation of the packet."""
+        if not self.payload:
+            return ''
+
+        hexd = hexdump.dumpgen(self.payload)
+        return '\n'.join(''.join((_DIRECTION_TO_PREFIX[self.direction], hexrow))
+                         for hexrow in hexd)
