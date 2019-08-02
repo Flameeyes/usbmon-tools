@@ -49,6 +49,7 @@ def parse_file(
             elif isinstance(block, pcapng.blocks.EnhancedPacket):
                 assert block.interface_id == 0
                 _, _, payload = block.packet_payload_info
+                assert endianness is not None
                 session.add(
                     usbmon.structs.Packet.from_bytes(
                         endianness, payload))
