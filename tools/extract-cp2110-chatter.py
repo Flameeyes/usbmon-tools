@@ -18,11 +18,22 @@
 
 import argparse
 import sys
-
 from typing import Optional
+
+import construct
 
 import usbmon.chatter
 import usbmon.pcapng
+
+
+_UART_CONFIG = construct.Struct(
+    construct.Const(b'\x50'),
+    'baudrate' / construct.Int32ub,
+    'parity' / construct.Byte,
+    'flow_control' / construct.Flag,
+    'data_bits' / construct.Byte,
+    'stop_bits' / construct.Byte,
+)
 
 
 def main():
@@ -51,22 +62,31 @@ def main():
             # No need to check second, they will be linked.
             continue
 
-        if first.xfer_type != usbmon.constants.XferType.INTERRUPT:
-            continue
+        if first.xfer_type == usbmon.constants.XferType.INTERRUPT:
+            if first.direction != direction and reconstructed_packet:
+                print(
+                    usbmon.chatter.dump_bytes(direction, reconstructed_packet))
+                direction = None
+                reconstructed_packet = b''
 
-        if first.direction != direction and reconstructed_packet:
-            print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
-            direction = None
-            reconstructed_packet = b''
+            direction = first.direction
+            if direction == usbmon.constants.Direction.OUT:
+                payload = first.payload
+            else:
+                payload = second.payload
 
-        direction = first.direction
-        if direction == usbmon.constants.Direction.OUT:
-            payload = first.payload
-        else:
-            payload = second.payload
+            if payload:
+                report = payload[0]
 
-        if payload and 0 <= payload[0] <= 0x3F:
-            reconstructed_packet += payload[1:]
+                if 0 <= report <= 0x3F:
+                    reconstructed_packet += payload[1:]
+                else:
+                    print('Report: %2x' % report)
+        elif first.xfer_type == usbmon.constants.XferType.CONTROL:
+            if first.payload and first.payload[0] == 0x50:
+                print(_UART_CONFIG.parse(first.payload))
+            if second.payload and second.payload[0] == 0x50:
+                print(_UART_CONFIG.parse(second.payload))
 
     print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
 
