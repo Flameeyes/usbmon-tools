@@ -24,16 +24,25 @@ import construct
 
 import usbmon.chatter
 import usbmon.pcapng
+from usbmon.support import cp2110
 
+def print_uart_config_packet(packet):
+    uart_config = cp2110.UART_CONFIG_STRUCT.parse(packet.payload)
 
-_UART_CONFIG = construct.Struct(
-    construct.Const(b'\x50'),
-    'baudrate' / construct.Int32ub,
-    'parity' / construct.Byte,
-    'flow_control' / construct.Flag,
-    'data_bits' / construct.Byte,
-    'stop_bits' / construct.Byte,
-)
+    if packet.direction == usbmon.constants.Direction.OUT:
+        command = 'SET UART CONFIG'
+    else:
+        command = 'GET UART CONFIG'
+
+    string_pieces = [
+        f'{command}:',
+        f'baudrate={uart_config.baudrate}',
+        f'parity={uart_config.parity!s}',
+        f'flow_control={uart_config.flow_control!s}',
+        f'data_bits={uart_config.data_bits}',
+        f'stop_bits={uart_config.stop_bits}',
+    ]
+    print(' '.join(string_pieces))
 
 
 def main():
@@ -83,10 +92,12 @@ def main():
                 else:
                     print('Report: %2x' % report)
         elif first.xfer_type == usbmon.constants.XferType.CONTROL:
-            if first.payload and first.payload[0] == 0x50:
-                print(_UART_CONFIG.parse(first.payload))
-            if second.payload and second.payload[0] == 0x50:
-                print(_UART_CONFIG.parse(second.payload))
+            if first.payload:
+                if first.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
+                    print_uart_config_packet(first)
+            if second.payload:
+                if second.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
+                    print_uart_config_packet(second)
 
     print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
 
