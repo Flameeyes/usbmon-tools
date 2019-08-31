@@ -33,36 +33,36 @@ def _usbmon_structure(endianness):
     """Return a construct.Struct() object suitable to parse a usbmon packet."""
 
     return construct.Struct(
-        'id' / construct.FormatField(endianness, 'Q'),
-        'type' / construct.Mapping(
+        id=construct.FormatField(endianness, 'Q'),
+        type=construct.Mapping(
             construct.Byte,
             {e: ord(e.value) for e in constants.PacketType}),
-        'xfer_type' / construct.Mapping(
+        xfer_type=construct.Mapping(
             construct.Byte,
             {e: e.value for e in constants.XferType}),
-        'epnum' / construct.Byte,
-        'devnum' / construct.Byte,
-        'busnum' / construct.FormatField(endianness, 'H'),
-        'flag_setup' / construct.Byte,
-        'flag_data' / construct.PaddedString(1, 'ascii'),
-        'ts_sec' / construct.FormatField(endianness, 'q'),
-        'ts_usec' / construct.FormatField(endianness, 'l'),
-        'status' / construct.FormatField(endianness, 'l'),
-        'length' / construct.FormatField(endianness, 'L'),
-        'len_cap' / construct.FormatField(endianness, 'L'),
-        's' / construct.Union(
+        epnum=construct.Byte,
+        devnum=construct.Byte,
+        busnum=construct.FormatField(endianness, 'H'),
+        flag_setup=construct.Byte,
+        flag_data=construct.PaddedString(1, 'ascii'),
+        ts_sec=construct.FormatField(endianness, 'q'),
+        ts_usec=construct.FormatField(endianness, 'l'),
+        status=construct.FormatField(endianness, 'l'),
+        length=construct.FormatField(endianness, 'L'),
+        len_cap=construct.FormatField(endianness, 'L'),
+        s=construct.Union(
             0,
-            'setup' / construct.Bytes(8),
-            'iso' / construct.Struct(
-                'error_count' / construct.FormatField(endianness, 'l'),
-                'numdesc' / construct.FormatField(endianness, 'l'),
+            setup=construct.Bytes(8),
+            iso=construct.Struct(
+                error_count=construct.FormatField(endianness, 'l'),
+                numdesc=construct.FormatField(endianness, 'l'),
             ),
         ),
-        'interval' / construct.FormatField(endianness, 'l'),
-        'start_frame' / construct.FormatField(endianness, 'l'),
-        'xfer_flags' / construct.FormatField(endianness, 'L'),
-        'ndesc' / construct.FormatField(endianness, 'L'),
-        'payload' / construct.GreedyBytes,
+        interval=construct.FormatField(endianness, 'l'),
+        start_frame=construct.FormatField(endianness, 'l'),
+        xfer_flags=construct.FormatField(endianness, 'L'),
+        ndesc=construct.FormatField(endianness, 'L'),
+        payload=construct.GreedyBytes,
     )
 
 

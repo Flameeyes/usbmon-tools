@@ -55,25 +55,25 @@ class Recipient(enum.Enum):
 
 
 _USB_SETUP_PACKET = construct.Struct(
-    'bmRequestType' / construct.Union(
+    bmRequestType=construct.Union(
         0,
-        'values' / construct.BitStruct(
-            'direction' / construct.Mapping(
+        values=construct.BitStruct(
+            direction=construct.Mapping(
                 construct.BitsInteger(1),
                 {e: e.value for e in Direction}),
-            'type' / construct.Mapping(
+            type=construct.Mapping(
                 construct.BitsInteger(2),
                 {e: e.value for e in Type}),
-            'recipient' / construct.Mapping(
+            recipient=construct.Mapping(
                 construct.BitsInteger(5),
                 {e: e.value for e in Recipient}),
         ),
-        'raw' / construct.Byte,
+        raw=construct.Byte,
     ),
-    'bRequest' / construct.Byte,
-    'wValue' / construct.Int16ul,
-    'wIndex' / construct.Int16ul,
-    'wLength' / construct.Int16ul,
+    bRequest=construct.Byte,
+    wValue=construct.Int16ul,
+    wIndex=construct.Int16ul,
+    wLength=construct.Int16ul,
 )
 
 
