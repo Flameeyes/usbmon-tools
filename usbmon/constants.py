@@ -18,19 +18,22 @@
 
 import enum
 
+@enum.unique
 class PacketType(enum.Enum):
     SUBMISSION = 'S'
     CALLBACK = 'C'
     ERROR = 'E'
 
 
-class XferType(enum.Enum):
+@enum.unique
+class XferType(enum.IntEnum):
     ISOCHRONOUS = 0
     INTERRUPT = 1
     CONTROL = 2
     BULK = 3
 
 
+@enum.unique
 class Direction(enum.Enum):
     OUT = 'o'
     IN = 'i'

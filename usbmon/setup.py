@@ -23,19 +23,22 @@ from typing import Optional
 import construct
 
 
-class Direction(enum.Enum):
+@enum.unique
+class Direction(enum.IntEnum):
     HOST_TO_DEVICE = 0
     DEVICE_TO_HOST = 1
 
 
-class Type(enum.Enum):
+@enum.unique
+class Type(enum.IntEnum):
     STANDARD = 0
     CLASS = 1
     VENDOR = 2
     RESERVED = 3
 
 
-class StandardRequest(enum.Enum):
+@enum.unique
+class StandardRequest(enum.IntEnum):
     GET_STATUS = 0x00
     CLEAR_FEATURE = 0x01
     SET_FEATURE = 0x03
@@ -46,7 +49,8 @@ class StandardRequest(enum.Enum):
     SET_CONFIGURATION = 0x09
 
 
-class Recipient(enum.Enum):
+@enum.unique
+class Recipient(enum.IntEnum):
     DEVICE = 0
     INTERFACE = 1
     ENDPOINT = 2

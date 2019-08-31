@@ -25,24 +25,28 @@ import enum
 import construct
 
 
-class ReportId(enum.Enum):
+@enum.unique
+class ReportId(enum.IntEnum):
     GET_SET_UART_CONFIG = 0x50
 
 
-class Parity(enum.Enum):
-    NONE = 0x01
+@enum.unique
+class Parity(enum.IntEnum):
+    NONE = 0x00
     ODD = 0x01
     EVEN = 0x02
     MARK = 0x03
     SPACE = 0x04
 
 
-class FlowControl(enum.Enum):
+@enum.unique
+class FlowControl(enum.IntEnum):
     NO = 0x00
-    HARDWARE = 0x00
+    HARDWARE = 0x01
 
 
-class StopBits(enum.Enum):
+@enum.unique
+class StopBits(enum.IntEnum):
     SHORT = 0x00
     LONG = 0x01
 
