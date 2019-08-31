@@ -46,6 +46,7 @@ setup(
     ),
     install_requires = [
         'construct>=2.9',
+        'hexdump',
         'python-pcapng',
     ],
 )
