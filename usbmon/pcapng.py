@@ -17,6 +17,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """pcapng file parser for usbmon tooling."""
 
+from typing import Optional
+
 import pcapng
 
 import usbmon.structs
@@ -35,7 +37,7 @@ def parse_file(
       A usbmon.capture_session.Session object.
     """
     session = usbmon.capture_session.Session(retag_urbs)
-    endianness = None
+    endianness: Optional[str] = None
     with open(path, 'rb') as pcap_file:
         scanner = pcapng.FileScanner(pcap_file)
         for block in scanner:

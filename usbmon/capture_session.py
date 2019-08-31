@@ -35,11 +35,13 @@ class Session:
         Args:
           retag_urbs: Whether to replace URB tags with new UUIDs.
         """
-        self._packet_pairs = []  # type: List[_PacketPair]
-        self._submitted_packets = {}  # type: Dict[str, structs.Packet]
-        self._retag_urbs = retag_urbs  # type: bool
+        self._packet_pairs: List[_PacketPair] = []
+        self._submitted_packets: Dict[str, structs.Packet] = {}
+        self._retag_urbs: bool = retag_urbs
 
-    def _append(self, first: structs.Packet, second: Optional[structs.Packet]):
+    def _append(
+            self, first: structs.Packet, second: Optional[structs.Packet]
+    ) -> None:
         if self._retag_urbs:
             # Totally random UUID, is more useful than the original URB ID.  We
             # take the hex string format, because that complies with the usbmon
@@ -50,7 +52,7 @@ class Session:
                 second.tag = tag
         self._packet_pairs.append((first, second))
 
-    def add(self, packet: structs.Packet):
+    def add(self, packet: structs.Packet) -> None:
         """Add a packet to the session, matching with its previous event."""
 
         # Events can be in either S;E, S;C, or C;S order. So we just keep a

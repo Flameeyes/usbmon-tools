@@ -83,7 +83,7 @@ _USB_SETUP_PACKET = construct.Struct(
 
 class SetupPacket:
 
-    def __init__(self, raw_packet):
+    def __init__(self, raw_packet: bytes):
         self._parsed = _USB_SETUP_PACKET.parse(raw_packet)
 
     @property
