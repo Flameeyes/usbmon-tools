@@ -23,6 +23,11 @@ import usbmon.pcapng
 import argparse
 import sys
 
+HID_XFER_TYPES = (
+    usbmon.constants.XferType.INTERRUPT,
+    usbmon.constants.XferType.CONTROL,
+)
+
 def main():
     if sys.version_info < (3, 7):
         raise Exception(
@@ -48,7 +53,13 @@ def main():
             # No need to check second, they will be linked.
             continue
 
-        if first.xfer_type != usbmon.constants.XferType.INTERRUPT:
+        if first.xfer_type == usbmon.constants.XferType.INTERRUPT:
+            pass
+        elif (first.xfer_type == usbmon.constants.XferType.CONTROL and
+              first.setup_packet and
+              first.setup_packet.type == usbmon.setup.Type.CLASS):
+            pass
+        else:
             continue
 
         if first.direction == usbmon.constants.Direction.OUT:
