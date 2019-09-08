@@ -61,7 +61,7 @@ class Recipient(enum.IntEnum):
 _USB_SETUP_PACKET = construct.Struct(
     bmRequestType=construct.Union(
         0,
-        values=construct.BitStruct(
+        parsed=construct.BitStruct(
             direction=construct.Mapping(
                 construct.BitsInteger(1),
                 {e: e.value for e in Direction}),
@@ -92,15 +92,15 @@ class SetupPacket:
 
     @property
     def direction(self) -> Direction:
-        return self._parsed.bmRequestType.direction
+        return self._parsed.bmRequestType.parsed.direction
 
     @property
     def type(self) -> Type:
-        return self._parsed.bmRequestType.type
+        return self._parsed.bmRequestType.parsed.type
 
     @property
     def recipient(self) -> Recipient:
-        return self._parsed.bmRequestType.recipient
+        return self._parsed.bmRequestType.parsed.recipient
 
     @property
     def request(self) -> int:
