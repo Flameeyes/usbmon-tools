@@ -17,7 +17,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """pcapng file parser for usbmon tooling."""
 
-from typing import Optional
+import io
+from typing import BinaryIO, Optional
 
 import pcapng
 
@@ -36,23 +37,55 @@ def parse_file(
     Returns:
       A usbmon.capture_session.Session object.
     """
+    with open(path, 'rb') as pcap_file:
+        return parse_stream(pcap_file, retag_urbs)
+
+
+def parse_bytes(
+        data: bytes,
+        retag_urbs: bool = True
+) -> usbmon.capture_session.Session:
+    """Parse the provided bytes array into a Session object.
+
+    Args:
+      data: a bytes array that contains the pcapng data to parse.
+      retag_urbs: Whether to re-generate tags for the URBs based on UUIDs.
+
+    Returns:
+      A usbmon.capture_session.Session object.
+    """
+    return parse_stream(io.BytesIO(data), retag_urbs)
+
+
+def parse_stream(
+        stream: BinaryIO,
+        retag_urbs: bool = True
+) -> usbmon.capture_session.Session:
+    """Parse the provided binary stream into a Session object.
+
+    Args:
+      stream: a BinaryIO object that contains the pcapng data to parse.
+      retag_urbs: Whether to re-generate tags for the URBs based on UUIDs.
+
+    Returns:
+      A usbmon.capture_session.Session object.
+    """
     session = usbmon.capture_session.Session(retag_urbs)
     endianness: Optional[str] = None
-    with open(path, 'rb') as pcap_file:
-        scanner = pcapng.FileScanner(pcap_file)
-        for block in scanner:
-            if isinstance(block, pcapng.blocks.SectionHeader):
-                endianness = block.endianness
-            elif isinstance(block, pcapng.blocks.InterfaceDescription):
-                if block.link_type != pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED:
-                    raise Exception(
-                        f"In file {path}: expected USB capture, "
-                        f"found {block.link_type_description}.")
-            elif isinstance(block, pcapng.blocks.EnhancedPacket):
-                assert block.interface_id == 0
-                _, _, payload = block.packet_payload_info
-                assert endianness is not None
-                session.add(
-                    usbmon.structs.Packet.from_bytes(
-                        endianness, payload))
+    scanner = pcapng.FileScanner(stream)
+    for block in scanner:
+        if isinstance(block, pcapng.blocks.SectionHeader):
+            endianness = block.endianness
+        elif isinstance(block, pcapng.blocks.InterfaceDescription):
+            if block.link_type != pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED:
+                raise Exception(
+                    f"In file {path}: expected USB capture, "
+                    f"found {block.link_type_description}.")
+        elif isinstance(block, pcapng.blocks.EnhancedPacket):
+            assert block.interface_id == 0
+            _, _, payload = block.packet_payload_info
+            assert endianness is not None
+            session.add(
+                usbmon.structs.Packet.from_bytes(
+                    endianness, payload))
     return session
