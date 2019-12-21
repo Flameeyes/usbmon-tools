@@ -79,8 +79,7 @@ def parse_stream(
         elif isinstance(block, pcapng.blocks.InterfaceDescription):
             if block.link_type != pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED:
                 raise Exception(
-                    f"In file {path}: expected USB capture, "
-                    f"found {block.link_type_description}.")
+                    f"Expected USB capture, found {block.link_type_description}.")
         elif isinstance(block, pcapng.blocks.EnhancedPacket):
             assert block.interface_id == 0
             _, _, payload = block.packet_payload_info
