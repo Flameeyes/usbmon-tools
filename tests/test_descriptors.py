@@ -56,3 +56,8 @@ class DescriptorsTest(absltest.TestCase):
 
         self.assertEqual(descriptor.vendor_id, 0x056e)
         self.assertEqual(descriptor.product_id, 0x00ff)
+
+    def test_no_descriptor(self):
+        packet_pair = _get_packets(_OTHER_PAIR)
+        descriptor = usbmon.descriptors.search_device_descriptor(packet_pair)
+        self.assertIsNone(descriptor)
