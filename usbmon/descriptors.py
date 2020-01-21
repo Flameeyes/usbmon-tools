@@ -31,6 +31,7 @@ _USB_DEVICE_DESCRIPTOR = construct.Struct(
         18, construct.Byte),
     bDescriptorType=construct.Const(
         0x01, construct.Byte),
+    bcdUSB=construct.Int16ub,
     bDeviceClass=construct.Byte,
     bDeviceSubClass=construct.Byte,
     bDeviceProtocol=construct.Byte,
@@ -55,6 +56,7 @@ class DeviceDescriptor:
             descriptor: bytes):
         self._address = address
         self._index = index
+        self._language_id = language_id
         self._parsed = _USB_DEVICE_DESCRIPTOR.parse(descriptor)
 
     @property
@@ -64,6 +66,10 @@ class DeviceDescriptor:
     @property
     def index(self) -> int:
         return self._index
+
+    @property
+    def language_id(self) -> int:
+        return self._language_id
 
     @property
     def device_class(self) -> int:
