@@ -50,7 +50,7 @@ class SessionTest(absltest.TestCase):
 
     def test_retag(self):
         session = usbmon.capture_session.Session(retag_urbs=True)
-        
+
         for base64_packet in _SESSION_BASE64:
             packet = usbmon.structs.Packet.from_bytes(
                 '<', binascii.a2b_base64(base64_packet))
@@ -65,7 +65,7 @@ class SessionTest(absltest.TestCase):
 
     def test_noretag(self):
         session = usbmon.capture_session.Session(retag_urbs=False)
-        
+
         for base64_packet in _SESSION_BASE64:
             packet = usbmon.structs.Packet.from_bytes(
                 '<', binascii.a2b_base64(base64_packet))
@@ -77,4 +77,19 @@ class SessionTest(absltest.TestCase):
         tag_counts = collections.Counter(
             (package.tag for package in session))
         self.assertCountEqual([4, 12], tag_counts.values())
-        
+
+
+class ConstructedSessionTest(absltest.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.session = usbmon.capture_session.Session(retag_urbs=True)
+
+        for base64_packet in _SESSION_BASE64:
+            packet = usbmon.structs.Packet.from_bytes(
+                '<', binascii.a2b_base64(base64_packet))
+            self.session.add(packet)
+
+    def test_device_descriptors(self):
+        self.assertLen(self.session.device_descriptors, 2)
+

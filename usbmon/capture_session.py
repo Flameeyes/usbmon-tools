@@ -19,9 +19,10 @@
 
 import itertools
 import logging
-from typing import Dict, Generator, List, Optional, Tuple
+from typing import Dict, Generator, List, Mapping, Optional, Tuple
 import uuid
 
+from usbmon import descriptors
 from usbmon import structs
 
 
@@ -36,6 +37,9 @@ class Session:
         self._packet_pairs: List[structs.PacketPair] = []
         self._submitted_packets: Dict[str, structs.Packet] = {}
         self._retag_urbs: bool = retag_urbs
+
+        self._device_descriptors: Optional[
+            Dict[str, descriptors.DeviceDescriptor]] = None
 
     def _append(
             self, first: structs.Packet, second: Optional[structs.Packet]
@@ -62,6 +66,13 @@ class Session:
         else:
             self._submitted_packets[packet.tag] = packet
 
+    def _scan_for_descriptors(self) -> None:
+        self._device_descriptors = {}
+        for pair in self.in_pairs():
+            descriptor = descriptors.search_device_descriptor(pair)
+            if descriptor:
+                self._device_descriptors[descriptor.address] = descriptor
+
     def in_order(self) -> Generator[structs.Packet, None, None]:
         """Yield the packets in their timestamp order."""
         yield from sorted(
@@ -73,3 +84,11 @@ class Session:
 
     def __iter__(self) -> Generator[structs.Packet, None, None]:
         return self.in_order()
+
+    @property
+    def device_descriptors(self) -> Mapping[str, descriptors.DeviceDescriptor]:
+        if self._device_descriptors is None:
+            self._scan_for_descriptors()
+        assert self._device_descriptors is not None
+
+        return self._device_descriptors

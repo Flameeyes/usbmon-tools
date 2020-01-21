@@ -40,22 +40,32 @@ def main():
     xfer_type_counter = collections.Counter()
 
     session = usbmon.pcapng.parse_file(args.pcap_file, retag_urbs=True)
+
     for packet in session:
         direction_counter[packet.direction] += 1
         addresses_counter[packet.address] += 1
         xfer_type_counter[packet.xfer_type] += 1
 
-    print('Packets per direction:')
+    print('Identified descriptors:')
+
+    print(' Devices')
+    for address, descriptor in session.device_descriptors.items():
+        print(f'   {address}: {descriptor!r}')
+
+    print()
+
+    print('Packet Counters:')
+    print(' Per direction:')
     for key, count in direction_counter.items():
-        print(f' {key!s}: {count}')
+        print(f'  {key!s}: {count}')
 
-    print('Packets per address:')
+    print(' Per address:')
     for key, count in addresses_counter.items():
-        print(f' {key!s}: {count}')
+        print(f'  {key!s}: {count}')
 
-    print('Packets per transfer type:')
+    print(' Per transfer type:')
     for key, count in xfer_type_counter.items():
-        print(f' {key!s}: {count}')
+        print(f'  {key!s}: {count}')
 
 
 if __name__ == "__main__":
