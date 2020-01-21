@@ -84,6 +84,7 @@ _USB_SETUP_PACKET = construct.Struct(
 class SetupPacket:
 
     def __init__(self, raw_packet: bytes):
+        self._raw = raw_packet
         self._parsed = _USB_SETUP_PACKET.parse(raw_packet)
 
     @property
@@ -125,7 +126,14 @@ class SetupPacket:
     def length(self) -> int:
         return self._parsed.wLength
 
+    @property
+    def raw(self) -> bytes:
+        return self._raw
+
     def __str__(self) -> str:
         return (
             f's {self.request_type:02x} {self.request:02x} '
             f'{self.value:04x} {self.index:04x} {self.length:04x}')
+
+    def __repr__(self) -> str:
+        return f'<usbmon.setup.SetupPacket {self.raw.hex()}>'
