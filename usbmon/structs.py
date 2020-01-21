@@ -166,7 +166,9 @@ class Packet:
             return value
 
     def __repr__(self) -> str:
-        return f'Packet<tag: {self.tag} address: {self.address!r} payload: {self.payload!r}>'
+        return (
+            f'<usbmon.structs.Packet tag: {self.tag}'
+            f' address: {self.address!r} payload: {self.payload!r}>')
 
     def __str__(self) -> str:
         # Try to keep compatibility with Linux usbmon's formatting, which
