@@ -53,7 +53,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '--cp2110_addr', action='store', type=str, required=True,
+        '--cp2110_addr', action='store', type=str,
         help='USB address of the CP2110 device to extract chatter of.')
 
     parser.add_argument(
@@ -66,6 +66,25 @@ def main():
     reconstructed_packet: bytes = b''
 
     session = usbmon.pcapng.parse_file(args.pcap_file, retag_urbs=True)
+
+    if not args.cp2110_addr:
+        # If there's no cp2110_addr flag on the command line, we can search for
+        # the device in the session's descriptors (if it's there at all.)  Note
+        # that this is not foolproof, because the CP2110 devices can be set to
+        # have their own custom VID/PID pairs.
+        for descriptor in session.device_descriptors.values():
+            if (
+                    descriptor.vendor_id == cp2110.DEFAULT_VENDOR_ID and
+                    descriptor.product_id == cp2110.DEFAULT_PRODUCT_ID and
+                    # Sometimes there's a descriptor for a not-fully-initialized
+                    # device, with no address. Exclude those.
+                    not descriptor.address.endswith('.0')
+            ):
+                args.cp2110_addr = descriptor.address
+
+    if not args.cp2110_addr:
+        raise parser.error('Unable to identify a CP2110 device descriptor.')
+
     for first, second in session.in_pairs():
         if not first.address.startswith(args.cp2110_addr):
             # No need to check second, they will be linked.

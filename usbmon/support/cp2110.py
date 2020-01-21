@@ -25,6 +25,10 @@ import enum
 import construct
 
 
+DEFAULT_VENDOR_ID = 0x10c4  # Silicon Labs
+DEFAULT_PRODUCT_ID = 0xea80
+
+
 @enum.unique
 class ReportId(enum.IntEnum):
     GET_SET_UART_CONFIG = 0x50
