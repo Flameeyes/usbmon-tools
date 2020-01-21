@@ -20,13 +20,15 @@ import datetime
 import enum
 import errno
 import re
-from typing import Union
+from typing import Optional, Tuple, Union
 
 import construct
 import hexdump
 
 from usbmon import constants
 from usbmon import setup
+
+PacketPair = Tuple['Packet', Optional['Packet']]
 
 
 def _usbmon_structure(endianness):

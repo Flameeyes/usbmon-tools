@@ -24,8 +24,6 @@ import uuid
 
 from usbmon import structs
 
-_PacketPair = Tuple[structs.Packet, Optional[structs.Packet]]
-
 
 class Session:
 
@@ -35,7 +33,7 @@ class Session:
         Args:
           retag_urbs: Whether to replace URB tags with new UUIDs.
         """
-        self._packet_pairs: List[_PacketPair] = []
+        self._packet_pairs: List[structs.PacketPair] = []
         self._submitted_packets: Dict[str, structs.Packet] = {}
         self._retag_urbs: bool = retag_urbs
 
@@ -70,7 +68,7 @@ class Session:
             filter(None, itertools.chain(*self._packet_pairs)),
             key=lambda x: x.timestamp)
 
-    def in_pairs(self) -> Generator[_PacketPair, None, None]:
+    def in_pairs(self) -> Generator[structs.PacketPair, None, None]:
         yield from self._packet_pairs
 
     def __iter__(self) -> Generator[structs.Packet, None, None]:
