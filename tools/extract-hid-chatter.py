@@ -49,6 +49,10 @@ def main():
 
     session = usbmon.pcapng.parse_file(args.pcap_file, retag_urbs=True)
     for first, second in session.in_pairs():
+        # Ignore stray callbacks/errors.
+        if not first.type == usbmon.constants.PacketType.SUBMISSION:
+            continue
+
         if not first.address.startswith(args.addr_prefix):
             # No need to check second, they will be linked.
             continue

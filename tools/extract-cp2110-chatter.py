@@ -86,6 +86,10 @@ def main():
         raise parser.error('Unable to identify a CP2110 device descriptor.')
 
     for first, second in session.in_pairs():
+        # Ignore stray callbacks/errors.
+        if not first.type == usbmon.constants.PacketType.SUBMISSION:
+            continue
+
         if not first.address.startswith(args.cp2110_addr):
             # No need to check second, they will be linked.
             continue

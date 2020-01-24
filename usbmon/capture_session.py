@@ -17,13 +17,18 @@
 # SPDX-License-Identifier: Apache-2.0
 """Abstraction to work with a collection of captured packets."""
 
+import datetime
 import itertools
 import logging
 from typing import Dict, Generator, List, Mapping, Optional, Tuple
 import uuid
 
+from usbmon import constants
 from usbmon import descriptors
 from usbmon import structs
+
+
+_MAX_CALLBACK_ANTICIPATION = datetime.timedelta(seconds=0.2)
 
 
 class Session:
@@ -62,9 +67,28 @@ class Session:
         # URB.
         if packet.tag in self._submitted_packets:
             first = self._submitted_packets.pop(packet.tag)
-            self._append(first, packet)
+            time_distance = abs(first.timestamp - packet.timestamp)
+
+            # Unfortunately, since the promise of the ID being unique is not
+            # maintained by Linux, there may be false matches. To reduce the
+            # likeliness of it, reject C events arriving more than 200ms before
+            # their matching S event.
+            if (first.type == constants.PacketType.CALLBACK and
+                time_distance > _MAX_CALLBACK_ANTICIPATION):
+                logging.debug(
+                    'Callback (%r) arrived long before submit (%r): %s',
+                    first, packet, time_distance)
+                self._append(first, None)
+                self._submitted_packets[packet.tag] = packet
+            else:
+                self._append(first, packet)
         else:
             self._submitted_packets[packet.tag] = packet
+
+    def in_pairs(self) -> Generator[structs.PacketPair, None, None]:
+        yield from self._packet_pairs
+        for unmatched_packet in self._submitted_packets.values():
+            yield (unmatched_packet, None)
 
     def _scan_for_descriptors(self) -> None:
         self._device_descriptors = {}
@@ -76,11 +100,8 @@ class Session:
     def in_order(self) -> Generator[structs.Packet, None, None]:
         """Yield the packets in their timestamp order."""
         yield from sorted(
-            filter(None, itertools.chain(*self._packet_pairs)),
+            filter(None, itertools.chain(*self.in_pairs())),
             key=lambda x: x.timestamp)
-
-    def in_pairs(self) -> Generator[structs.PacketPair, None, None]:
-        yield from self._packet_pairs
 
     def __iter__(self) -> Generator[structs.Packet, None, None]:
         return self.in_order()

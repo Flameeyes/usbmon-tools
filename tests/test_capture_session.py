@@ -78,6 +78,19 @@ class SessionTest(absltest.TestCase):
             (package.tag for package in session))
         self.assertCountEqual([4, 12], tag_counts.values())
 
+    def test_incomplete(self):
+        session = usbmon.capture_session.Session(retag_urbs=False)
+
+        # Skip over the first and last packets.
+        incomplete_session = _SESSION_BASE64[1:-1]
+        for base64_packet in incomplete_session:
+            packet = usbmon.structs.Packet.from_bytes(
+                '<', binascii.a2b_base64(base64_packet))
+            session.add(packet)
+
+        self.assertLen(list(session), 14)
+        self.assertLen(list(session.in_pairs()), 8)
+
 
 class ConstructedSessionTest(absltest.TestCase):
 
@@ -92,4 +105,3 @@ class ConstructedSessionTest(absltest.TestCase):
 
     def test_device_descriptors(self):
         self.assertLen(self.session.device_descriptors, 2)
-
