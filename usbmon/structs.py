@@ -169,7 +169,7 @@ class Packet:
 
     def __repr__(self) -> str:
         return (
-            f'<usbmon.structs.Packet tag: {self.tag}'
+            f'<usbmon.structs.Packet type: {self.type} tag: {self.tag}'
             f' address: {self.address!r} payload: {self.payload!r}>')
 
     def __str__(self) -> str:
