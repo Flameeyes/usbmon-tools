@@ -85,6 +85,6 @@ def parse_stream(
             _, _, payload = block.packet_payload_info
             assert endianness is not None
             session.add(
-                usbmon.structs.Packet.from_bytes(
+                usbmon.structs.Packet.from_usbmon_mmap(
                     endianness, payload))
     return session

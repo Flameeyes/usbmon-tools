@@ -79,7 +79,7 @@ _XFERTYPE_TO_MNEMONIC = {
 class Packet:
 
     @staticmethod
-    def from_bytes(endianness: str, raw_packet: bytes) -> 'Packet':
+    def from_usbmon_mmap(endianness: str, raw_packet: bytes) -> 'Packet':
         return Packet(_usbmon_structure(endianness).parse(raw_packet))
 
     def __init__(self, constructed_object):

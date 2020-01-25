@@ -38,7 +38,7 @@ _OTHER_PAIR = (
 
 def _get_packets(base64_packets):
     return tuple(
-        usbmon.structs.Packet.from_bytes('<', binascii.a2b_base64(packet))
+        usbmon.structs.Packet.from_usbmon_mmap('<', binascii.a2b_base64(packet))
         for packet in base64_packets)
 
 

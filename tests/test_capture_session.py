@@ -52,7 +52,7 @@ class SessionTest(absltest.TestCase):
         session = usbmon.capture_session.Session(retag_urbs=True)
 
         for base64_packet in _SESSION_BASE64:
-            packet = usbmon.structs.Packet.from_bytes(
+            packet = usbmon.structs.Packet.from_usbmon_mmap(
                 '<', binascii.a2b_base64(base64_packet))
             session.add(packet)
 
@@ -67,7 +67,7 @@ class SessionTest(absltest.TestCase):
         session = usbmon.capture_session.Session(retag_urbs=False)
 
         for base64_packet in _SESSION_BASE64:
-            packet = usbmon.structs.Packet.from_bytes(
+            packet = usbmon.structs.Packet.from_usbmon_mmap(
                 '<', binascii.a2b_base64(base64_packet))
             session.add(packet)
 
@@ -84,7 +84,7 @@ class SessionTest(absltest.TestCase):
         # Skip over the first and last packets.
         incomplete_session = _SESSION_BASE64[1:-1]
         for base64_packet in incomplete_session:
-            packet = usbmon.structs.Packet.from_bytes(
+            packet = usbmon.structs.Packet.from_usbmon_mmap(
                 '<', binascii.a2b_base64(base64_packet))
             session.add(packet)
 
@@ -99,7 +99,7 @@ class ConstructedSessionTest(absltest.TestCase):
         self.session = usbmon.capture_session.Session(retag_urbs=True)
 
         for base64_packet in _SESSION_BASE64:
-            packet = usbmon.structs.Packet.from_bytes(
+            packet = usbmon.structs.Packet.from_usbmon_mmap(
                 '<', binascii.a2b_base64(base64_packet))
             self.session.add(packet)
 
