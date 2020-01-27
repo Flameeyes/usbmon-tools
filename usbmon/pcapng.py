@@ -22,12 +22,12 @@ from typing import BinaryIO, Optional
 
 import pcapng
 
-import usbmon.structs
-import usbmon.capture_session
+from usbmon.capture import usbmon_mmap
+from usbmon import capture_session
 
 
 def parse_file(
-        path: str, retag_urbs: bool = True) -> usbmon.capture_session.Session:
+        path: str, retag_urbs: bool = True) -> capture_session.Session:
     """Parse the provided pcang file path into a Session object.
 
     Args:
@@ -42,9 +42,7 @@ def parse_file(
 
 
 def parse_bytes(
-        data: bytes,
-        retag_urbs: bool = True
-) -> usbmon.capture_session.Session:
+        data: bytes, retag_urbs: bool = True) -> capture_session.Session:
     """Parse the provided bytes array into a Session object.
 
     Args:
@@ -58,9 +56,7 @@ def parse_bytes(
 
 
 def parse_stream(
-        stream: BinaryIO,
-        retag_urbs: bool = True
-) -> usbmon.capture_session.Session:
+        stream: BinaryIO, retag_urbs: bool = True) -> capture_session.Session:
     """Parse the provided binary stream into a Session object.
 
     Args:
@@ -70,7 +66,7 @@ def parse_stream(
     Returns:
       A usbmon.capture_session.Session object.
     """
-    session = usbmon.capture_session.Session(retag_urbs)
+    session = capture_session.Session(retag_urbs)
     endianness: Optional[str] = None
     scanner = pcapng.FileScanner(stream)
     for block in scanner:
@@ -85,6 +81,6 @@ def parse_stream(
             _, _, payload = block.packet_payload_info
             assert endianness is not None
             session.add(
-                usbmon.structs.Packet.from_usbmon_mmap(
+                usbmon_mmap.UsbmonMmapPacket(
                     endianness, payload))
     return session

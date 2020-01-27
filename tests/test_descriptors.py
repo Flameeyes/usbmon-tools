@@ -22,7 +22,7 @@ import binascii
 from absl.testing import absltest
 
 import usbmon.descriptors
-import usbmon.structs
+import usbmon.capture.usbmon_mmap
 
 
 _GET_DEVICE_DESCRIPTOR_PAIR = (
@@ -38,7 +38,8 @@ _OTHER_PAIR = (
 
 def _get_packets(base64_packets):
     return tuple(
-        usbmon.structs.Packet.from_usbmon_mmap('<', binascii.a2b_base64(packet))
+        usbmon.capture.usbmon_mmap.UsbmonMmapPacket(
+            '<', binascii.a2b_base64(packet))
         for packet in base64_packets)
 
 

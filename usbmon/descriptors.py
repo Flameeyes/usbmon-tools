@@ -23,8 +23,9 @@ from typing import Any, Optional
 
 import construct
 
+from usbmon import packet
 from usbmon import setup
-from usbmon import structs
+
 
 _USB_DEVICE_DESCRIPTOR = construct.Struct(
     bLength=construct.Const(
@@ -107,7 +108,7 @@ class DeviceDescriptor:
             f'{self.vendor_id:04x}:{self.product_id:04x}>')
 
 def search_device_descriptor(
-        pair: structs.PacketPair) -> Optional[DeviceDescriptor]:
+        pair: packet.PacketPair) -> Optional[DeviceDescriptor]:
     submit, callback = pair
 
     if (

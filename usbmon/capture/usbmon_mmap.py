@@ -1,6 +1,6 @@
 # python
 #
-# Copyright 2019 The usbmon-tools Authors
+# Copyright 2019-2020 The usbmon-tools Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,18 +17,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import datetime
-import enum
 import errno
-import re
-from typing import Optional, Tuple, Union
+from typing import Union
 
 import construct
 import hexdump
 
 from usbmon import constants
+from usbmon import packet
 from usbmon import setup
-
-PacketPair = Tuple['Packet', Optional['Packet']]
 
 
 def _usbmon_structure(endianness):
@@ -68,21 +65,12 @@ def _usbmon_structure(endianness):
     )
 
 
-_XFERTYPE_TO_MNEMONIC = {
-    constants.XferType.ISOCHRONOUS: 'Z',
-    constants.XferType.INTERRUPT: 'I',
-    constants.XferType.CONTROL: 'C',
-    constants.XferType.BULK: 'B',
-}
+class UsbmonMmapPacket(packet.Packet):
 
+    def __init__(self, endianness: str, raw_packet: bytes):
+        super().__init__()
+        constructed_object = _usbmon_structure(endianness).parse(raw_packet)
 
-class Packet:
-
-    @staticmethod
-    def from_usbmon_mmap(endianness: str, raw_packet: bytes) -> 'Packet':
-        return Packet(_usbmon_structure(endianness).parse(raw_packet))
-
-    def __init__(self, constructed_object):
         # The binary ID value is usually a pointer in memory. Keep the text
         # representation instead, because it should be considered an opaque
         # value.
@@ -124,12 +112,7 @@ class Packet:
 
         assert constructed_object.len_cap == len(self.payload)
 
-        # Split the direction from the endpoint
-        self.endpoint = constructed_object.epnum & 0x7F
-        if constructed_object.epnum & 0x80:
-            self.direction = constants.Direction.IN
-        else:
-            self.direction = constants.Direction.OUT
+        self.epnum = constructed_object.epnum
 
     @property
     def error(self) -> Union[str, int, None]:
@@ -141,14 +124,6 @@ class Packet:
                 return self.status
         else:
             return None
-
-    @property
-    def address(self) -> str:
-        return f'{self.busnum}.{self.devnum}.{self.endpoint}'
-
-    @property
-    def type_mnemonic(self) -> str:
-        return _XFERTYPE_TO_MNEMONIC[self.xfer_type]
 
     @property
     def setup_packet_string(self) -> str:
@@ -166,11 +141,6 @@ class Packet:
             if self.flag_setup == '-':
                 value += ' __ __ ____ ____ ____'
             return value
-
-    def __repr__(self) -> str:
-        return (
-            f'<usbmon.structs.Packet type: {self.type} tag: {self.tag}'
-            f' address: {self.address!r} payload: {self.payload!r}>')
 
     def __str__(self) -> str:
         # Try to keep compatibility with Linux usbmon's formatting, which

@@ -21,7 +21,7 @@ from typing import Optional
 import hexdump
 
 from usbmon import constants
-from usbmon import structs
+from usbmon import packet
 
 _DIRECTION_TO_PREFIX = {
     constants.Direction.OUT: 'H>>D ',
@@ -68,5 +68,5 @@ def dump_bytes(
         ''.join((line_prefix, hexrow)) for hexrow in hexd)
 
 
-def dump_packet(packet: structs.Packet, **kwargs) -> str:
+def dump_packet(packet: packet.Packet, **kwargs) -> str:
     return dump_bytes(packet.direction, packet.payload, **kwargs)
