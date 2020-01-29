@@ -80,21 +80,21 @@ class Packet(abc.ABC):
 
 def get_submission(pair: PacketPair):
     first, second = pair
-    if first.type == usbmon.constants.PacketType.SUBMISSION:
+    if first.type == constants.PacketType.SUBMISSION:
         return first
     else:
         return second
 
 def get_callback(pair: PacketPair):
     first, second = pair
-    if first.type == usbmon.constants.PacketType.CALLBACK:
+    if first.type == constants.PacketType.CALLBACK:
         return first
     else:
         return second
 
 def get_error(pair: PacketPair):
     first, second = pair
-    if first.type == usbmon.constants.PacketType.ERROR:
+    if first.type == constants.PacketType.ERROR:
         return first
     else:
         return second
