@@ -97,5 +97,6 @@ def parse_stream(
             elif link_type == 249:
                 parsed_packet = usbpcap.UsbpcapPacket(block)
 
+            assert parsed_packet is not None
             session.add(parsed_packet)
     return session
