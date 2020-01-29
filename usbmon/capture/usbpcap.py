@@ -89,14 +89,14 @@ class UsbpcapPacket(packet.Packet):
 
         self.status = constructed_object.status
 
-        expected_data = constructed_object.dataLength
+        self.length = constructed_object.dataLength
 
         self.setup_packet = None
         if self.xfer_type == constants.XferType.CONTROL:
             if constructed_object.control_header.setup_packet:
                 self.setup_packet = setup.SetupPacket(
                     constructed_object.control_header.setup_packet)
-                expected_data -= 8  # size of setup packet.
+                self.length -= 8  # size of setup packet.
 
         self.epnum = constructed_object.epnum
 

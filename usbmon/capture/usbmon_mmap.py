@@ -18,6 +18,7 @@
 
 import datetime
 import errno
+import logging
 from typing import Union
 
 import construct
@@ -107,12 +108,11 @@ class UsbmonMmapPacket(packet.Packet):
 
         self.xfer_flags = constructed_object.xfer_flags
         self.ndesc = constructed_object.ndesc
+        self.length = constructed_object.length
         self.payload = constructed_object.payload
+        self.epnum = constructed_object.epnum
 
         assert constructed_object.len_cap == len(self.payload)
-        assert constructed_object.length == len(self.payload)
-
-        self.epnum = constructed_object.epnum
 
     @property
     def error(self) -> Union[str, int, None]:
