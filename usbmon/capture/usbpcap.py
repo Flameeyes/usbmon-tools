@@ -105,10 +105,6 @@ class UsbpcapPacket(packet.Packet):
             print('expected %04x bytes found %04x' % (expected_data, len(self.payload)))
 
     @property
-    def length(self) -> int:
-        return len(self.payload)
-
-    @property
     def setup_packet_string(self) -> str:
         if self.setup_packet:
             return str(self.setup_packet)

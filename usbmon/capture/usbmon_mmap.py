@@ -96,7 +96,6 @@ class UsbmonMmapPacket(packet.Packet):
         self.timestamp = datetime.datetime.fromtimestamp(
             constructed_object.ts_sec + (1e-6 * constructed_object.ts_usec))
         self.status = constructed_object.status
-        self.length = constructed_object.length
 
         if self.xfer_type in (constants.XferType.INTERRUPT, constants.XferType.ISOCHRONOUS):
             self.interval = constructed_object.interval
@@ -111,6 +110,7 @@ class UsbmonMmapPacket(packet.Packet):
         self.payload = constructed_object.payload
 
         assert constructed_object.len_cap == len(self.payload)
+        assert constructed_object.length == len(self.payload)
 
         self.epnum = constructed_object.epnum
 

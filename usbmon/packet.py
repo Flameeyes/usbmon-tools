@@ -44,7 +44,6 @@ class Packet(abc.ABC):
     setup_packet: Optional[setup.SetupPacket]
     timestamp: datetime.datetime
     status: int
-    length: int
 
     payload: bytes
 
@@ -60,6 +59,10 @@ class Packet(abc.ABC):
             return constants.Direction.IN
         else:
             return constants.Direction.OUT
+
+    @property
+    def length(self) -> int:
+        return len(self.payload)
 
     @property
     def address(self) -> str:
