@@ -108,11 +108,11 @@ class UsbpcapPacket(packet.Packet):
     def setup_packet_string(self) -> str:
         if self.setup_packet:
             return str(self.setup_packet)
-        elif self.xfer_type == constants.XferType.ISOCHRONOUS:
-            value = f'{self.status}::{self.start_frame}'
-            if self.type != constants.PacketType.SUBMISSION:
-                value += f':{self.error_count}'
-            return value
+        # elif self.xfer_type == constants.XferType.ISOCHRONOUS:
+        #     value = f'{self.status}::{self.start_frame}'
+        #     if self.type != constants.PacketType.SUBMISSION:
+        #         value += f':{self.error_count}'
+        #     return value
         else:
             return str(self.status)
 
