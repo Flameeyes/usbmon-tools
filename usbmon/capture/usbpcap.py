@@ -20,6 +20,7 @@ import datetime
 import enum
 
 import construct
+import hexdump
 import pcapng
 
 from usbmon import constants
@@ -86,6 +87,8 @@ class UsbpcapPacket(packet.Packet):
         self.devnum = constructed_object.devnum
         self.busnum = constructed_object.busnum
 
+        self.status = constructed_object.status
+
         expected_data = constructed_object.dataLength
 
         self.setup_packet = None
@@ -100,3 +103,36 @@ class UsbpcapPacket(packet.Packet):
         self.payload = constructed_object.payload
         if expected_data != len(self.payload):
             print('expected %04x bytes found %04x' % (expected_data, len(self.payload)))
+
+    @property
+    def length(self) -> int:
+        return len(self.payload)
+
+    @property
+    def setup_packet_string(self) -> str:
+        if self.setup_packet:
+            return str(self.setup_packet)
+        elif self.xfer_type == constants.XferType.ISOCHRONOUS:
+            value = f'{self.status}::{self.start_frame}'
+            if self.type != constants.PacketType.SUBMISSION:
+                value += f':{self.error_count}'
+            return value
+        else:
+            return str(self.status)
+
+    def __str__(self) -> str:
+        # Try to keep compatibility with Linux usbmon's formatting, which
+        # annoyingly seems to cut this at 4-bytes groups.
+        if self.payload:
+            payload_dump = hexdump.dump(self.payload, size=8).lower()
+            payload_string = f'= {payload_dump}'
+        elif (self.xfer_type == constants.XferType.INTERRUPT and
+              self.direction == constants.Direction.IN):
+            payload_string = '<'
+        else:
+            payload_string = '?'
+
+        return (
+            f'{self.tag} {self.timestamp.timestamp() * 1e6:.0f} '
+            f'{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} '
+            f'{self.setup_packet_string} {self.length} {payload_string}').rstrip()
