@@ -23,7 +23,15 @@ from typing import BinaryIO, Optional
 import pcapng
 
 from usbmon.capture import usbmon_mmap
+from usbmon.capture import usbpcap
 from usbmon import capture_session
+from usbmon import packet
+
+_SUPPORTED_LINKTYPES = (
+    pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED,
+    # pcapng.constants.link_types.LINKTYPE_USBPCAP,
+    249,
+)
 
 
 def parse_file(
@@ -68,19 +76,26 @@ def parse_stream(
     """
     session = capture_session.Session(retag_urbs)
     endianness: Optional[str] = None
+    link_type: Optional[int] = None
+    parsed_packet: Optional[packet.Packet] = None
     scanner = pcapng.FileScanner(stream)
     for block in scanner:
         if isinstance(block, pcapng.blocks.SectionHeader):
             endianness = block.endianness
         elif isinstance(block, pcapng.blocks.InterfaceDescription):
-            if block.link_type != pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED:
+            if block.link_type not in _SUPPORTED_LINKTYPES:
                 raise Exception(
                     f"Expected USB capture, found {block.link_type_description}.")
+            link_type = block.link_type
         elif isinstance(block, pcapng.blocks.EnhancedPacket):
             assert block.interface_id == 0
-            _, _, payload = block.packet_payload_info
             assert endianness is not None
-            session.add(
-                usbmon_mmap.UsbmonMmapPacket(
-                    endianness, payload))
+            assert link_type is not None
+            if link_type == pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED:
+                parsed_packet = usbmon_mmap.UsbmonMmapPacket(
+                        endianness, block.packet_data)
+            elif link_type == 249:
+                parsed_packet = usbpcap.UsbpcapPacket(block)
+
+            session.add(parsed_packet)
     return session
