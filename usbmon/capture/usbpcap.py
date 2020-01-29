@@ -18,6 +18,7 @@
 
 import datetime
 import enum
+import logging
 
 import construct
 import hexdump
@@ -101,8 +102,9 @@ class UsbpcapPacket(packet.Packet):
         self.epnum = constructed_object.epnum
 
         self.payload = constructed_object.payload
-        if expected_data != len(self.payload):
-            print('expected %04x bytes found %04x' % (expected_data, len(self.payload)))
+        if self.length != len(self.payload):
+            logging.warning('expected %d bytes, found %d',
+                            self.length, len(self.payload))
 
     @property
     def setup_packet_string(self) -> str:
