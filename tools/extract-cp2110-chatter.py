@@ -22,6 +22,7 @@ from typing import Optional
 
 import construct
 
+import usbmon
 import usbmon.chatter
 import usbmon.pcapng
 from usbmon.support import cp2110
@@ -85,27 +86,33 @@ def main():
     if not args.cp2110_addr:
         raise parser.error('Unable to identify a CP2110 device descriptor.')
 
-    for first, second in session.in_pairs():
-        # Ignore stray callbacks/errors.
-        if not first.type == usbmon.constants.PacketType.SUBMISSION:
+    for pair in session.in_pairs():
+        submission = usbmon.packet.get_submission(pair)
+        callback = usbmon.packet.get_callback(pair)
+
+        if not submission or not callback:
+            # We don't care which one is missing, we can just get the first
+            # packet's tag. If there's an ERROR packet, it'll also behave as we
+            # want it to.
+            logging.debug('Ignoring singleton packet: %s' % pair[0].tag)
             continue
 
-        if not first.address.startswith(args.cp2110_addr):
+        if not submission.address.startswith(args.cp2110_addr):
             # No need to check second, they will be linked.
             continue
 
-        if first.xfer_type == usbmon.constants.XferType.INTERRUPT:
-            if first.direction != direction and reconstructed_packet:
+        if submission.xfer_type == usbmon.constants.XferType.INTERRUPT:
+            if submission.direction != direction and reconstructed_packet:
                 print(
                     usbmon.chatter.dump_bytes(direction, reconstructed_packet))
                 direction = None
                 reconstructed_packet = b''
 
-            direction = first.direction
+            direction = submission.direction
             if direction == usbmon.constants.Direction.OUT:
-                payload = first.payload
+                payload = submission.payload
             else:
-                payload = second.payload
+                payload = callback.payload
 
             if payload:
                 report = payload[0]
@@ -114,13 +121,13 @@ def main():
                     reconstructed_packet += payload[1:]
                 else:
                     print('Report: %2x' % report)
-        elif first.xfer_type == usbmon.constants.XferType.CONTROL:
-            if first.payload:
-                if first.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
-                    print_uart_config_packet(first)
-            if second.payload:
-                if second.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
-                    print_uart_config_packet(second)
+        elif submission.xfer_type == usbmon.constants.XferType.CONTROL:
+            if submission.payload:
+                if submission.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
+                    print_uart_config_packet(submission)
+            if callback.payload:
+                if callback.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
+                    print_uart_config_packet(callback)
 
     print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
 

@@ -16,12 +16,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
+import logging
+import sys
+
 import usbmon
 import usbmon.chatter
+import usbmon.constants
 import usbmon.pcapng
-
-import argparse
-import sys
 
 HID_XFER_TYPES = (
     usbmon.constants.XferType.INTERRUPT,
@@ -48,31 +50,37 @@ def main():
     args = parser.parse_args()
 
     session = usbmon.pcapng.parse_file(args.pcap_file, retag_urbs=True)
-    for first, second in session.in_pairs():
-        # Ignore stray callbacks/errors.
-        if not first.type == usbmon.constants.PacketType.SUBMISSION:
+    for pair in session.in_pairs():
+        submission = usbmon.packet.get_submission(pair)
+        callback = usbmon.packet.get_callback(pair)
+
+        if not submission or not callback:
+            # We don't care which one is missing, we can just get the first
+            # packet's tag. If there's an ERROR packet, it'll also behave as we
+            # want it to.
+            logging.debug('Ignoring singleton packet: %s' % pair[0].tag)
             continue
 
-        if not first.address.startswith(args.addr_prefix):
+        if not submission.address.startswith(args.addr_prefix):
             # No need to check second, they will be linked.
             continue
 
-        if first.xfer_type == usbmon.constants.XferType.INTERRUPT:
+        if submission.xfer_type == usbmon.constants.XferType.INTERRUPT:
             pass
-        elif (first.xfer_type == usbmon.constants.XferType.CONTROL and
-              first.setup_packet and
-              first.setup_packet.type == usbmon.setup.Type.CLASS):
+        elif (submission.xfer_type == usbmon.constants.XferType.CONTROL and
+              submission.setup_packet and
+              submission.setup_packet.type == usbmon.setup.Type.CLASS):
             pass
         else:
             continue
 
-        if first.direction == usbmon.constants.Direction.OUT:
-            packet = first
+        if submission.direction == usbmon.constants.Direction.OUT:
+            dumped_packet = submission
         else:
-            packet = second
+            dumped_packet = callback
 
-        if packet.payload:
-            print(usbmon.chatter.dump_packet(packet), '\n')
+        if dumped_packet.payload:
+            print(usbmon.chatter.dump_packet(dumped_packet), '\n')
 
 
 if __name__ == "__main__":

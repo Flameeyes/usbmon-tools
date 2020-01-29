@@ -73,3 +73,25 @@ class Packet(abc.ABC):
         return (
             f'<{type(self).__name__} type: {self.type} tag: {self.tag}'
             f' address: {self.address!r} payload: {self.payload!r}>')
+
+
+def get_submission(pair: PacketPair):
+    first, second = pair
+    if first.type == usbmon.constants.PacketType.SUBMISSION:
+        return first
+    else:
+        return second
+
+def get_callback(pair: PacketPair):
+    first, second = pair
+    if first.type == usbmon.constants.PacketType.CALLBACK:
+        return first
+    else:
+        return second
+
+def get_error(pair: PacketPair):
+    first, second = pair
+    if first.type == usbmon.constants.PacketType.ERROR:
+        return first
+    else:
+        return second
