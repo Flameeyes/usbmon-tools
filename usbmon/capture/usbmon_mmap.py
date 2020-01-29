@@ -18,7 +18,6 @@
 
 import datetime
 import errno
-import logging
 from typing import Union
 
 import construct
