@@ -131,11 +131,18 @@ def search_device_descriptor(
 
     if descriptor_type != 0x01:
         logging.debug(
-            'invalid GET_DESCRIPTION setup packet: %r', submit.setup_packet)
+            'invalid GET_DESCRIPTION setup packet (%s): %r',
+            submit.tag, submit.setup_packet)
         return None
 
-    return DeviceDescriptor(
-        device_address,
-        descriptor_index,
-        submit.setup_packet.index,
-        callback.payload)
+    try:
+        return DeviceDescriptor(
+            device_address,
+            descriptor_index,
+            submit.setup_packet.index,
+            callback.payload)
+    except construct.core.StreamError as parse_error:
+        logging.debug(
+            'invalid device descriptor (%s): %s',
+            submit.tag, parse_error)
+        return None
