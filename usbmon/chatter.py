@@ -20,8 +20,7 @@ from typing import Optional
 
 import hexdump
 
-from usbmon import constants
-from usbmon import packet
+from usbmon import constants, packet
 
 _DIRECTION_TO_PREFIX = {
     constants.Direction.OUT: 'H>>D ',

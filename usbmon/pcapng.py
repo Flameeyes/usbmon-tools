@@ -22,10 +22,8 @@ from typing import BinaryIO, Optional
 
 import pcapng
 
-from usbmon.capture import usbmon_mmap
-from usbmon.capture import usbpcap
-from usbmon import capture_session
-from usbmon import packet
+from usbmon import capture_session, packet
+from usbmon.capture import usbmon_mmap, usbpcap
 
 _SUPPORTED_LINKTYPES = (
     pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED,

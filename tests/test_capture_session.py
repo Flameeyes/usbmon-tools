@@ -22,9 +22,8 @@ import collections
 
 from absl.testing import absltest
 
-import usbmon.capture_session
 import usbmon.capture.usbmon_mmap
-
+import usbmon.capture_session
 
 _SESSION_BASE64 = (
     'AKrN2gAAAABTAoACAQAAPMUvaFwAAAAAIsoBAI3///8oAAAAAAAAAIAGAAEAACgAAAAAAAAAAAAAAgAAAAAAAA==',

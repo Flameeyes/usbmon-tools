@@ -21,9 +21,8 @@ import binascii
 
 from absl.testing import absltest
 
-import usbmon.descriptors
 import usbmon.capture.usbmon_mmap
-
+import usbmon.descriptors
 
 _GET_DEVICE_DESCRIPTOR_PAIR = (
     'AKrN2gAAAABTAoACAQAAPMUvaFwAAAAAIsoBAI3///8oAAAAAAAAAIAGAAEAACgAAAAAAAAAAAAAAgAAAAAAAA==',

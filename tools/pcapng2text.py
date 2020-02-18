@@ -33,10 +33,11 @@ with a few notable changes:
    constrained to 32-bit range.
 """
 
-import usbmon.pcapng
-
 import argparse
 import sys
+
+import usbmon.pcapng
+
 
 def main():
     if sys.version_info < (3, 7):

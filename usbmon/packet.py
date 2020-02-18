@@ -18,11 +18,9 @@
 
 import abc
 import datetime
+from typing import Optional, Tuple
 
-from typing import Tuple, Optional
-
-from usbmon import constants
-from usbmon import setup
+from usbmon import constants, setup
 
 PacketPair = Tuple['Packet', Optional['Packet']]
 

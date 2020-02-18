@@ -22,9 +22,7 @@ import errno
 
 from absl.testing import absltest
 
-
 import usbmon.capture.usbmon_mmap
-
 
 _INTERRUPT_C_BASE64 = (
     'gLi22gAAAABDAYECAQAtAMkvaFwAAAAAYfwDAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAA'

@@ -20,13 +20,10 @@
 import datetime
 import itertools
 import logging
-from typing import Dict, Generator, List, Mapping, Optional, Tuple
 import uuid
+from typing import Dict, Generator, List, Mapping, Optional, Tuple
 
-from usbmon import constants
-from usbmon import descriptors
-from usbmon import packet
-
+from usbmon import constants, descriptors, packet
 
 _MAX_CALLBACK_ANTICIPATION = datetime.timedelta(seconds=0.2)
 

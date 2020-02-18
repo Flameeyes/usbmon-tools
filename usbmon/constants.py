@@ -18,6 +18,7 @@
 
 import enum
 
+
 @enum.unique
 class PacketType(enum.Enum):
     SUBMISSION = 'S'

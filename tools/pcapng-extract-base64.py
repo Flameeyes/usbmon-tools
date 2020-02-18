@@ -23,6 +23,7 @@ import sys
 
 import pcapng
 
+
 def main():
     if sys.version_info < (3, 7):
         raise Exception(

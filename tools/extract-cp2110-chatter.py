@@ -27,6 +27,7 @@ import usbmon.chatter
 import usbmon.pcapng
 from usbmon.support import cp2110
 
+
 def print_uart_config_packet(packet):
     uart_config = cp2110.UART_CONFIG_STRUCT.parse(packet.payload)
 
