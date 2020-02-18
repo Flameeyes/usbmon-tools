@@ -25,25 +25,24 @@ import usbmon.pcapng
 
 
 class PcapTest(absltest.TestCase):
-
     def setUp(self):
         super().setUp()
         self._test1_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'testdata/test1.pcap')
+            os.path.dirname(os.path.abspath(__file__)), "testdata/test1.pcap"
+        )
 
     def test_parse_file(self):
         session = usbmon.pcapng.parse_file(self._test1_path)
         self.assertLen(list(session), 16)
 
     def test_parse_bytes(self):
-        with open(self._test1_path, 'rb') as test1_file:
+        with open(self._test1_path, "rb") as test1_file:
             pcap_data = test1_file.read()
 
         session = usbmon.pcapng.parse_bytes(pcap_data)
         self.assertLen(list(session), 16)
 
     def test_parse_stream(self):
-        with open(self._test1_path, 'rb') as test1_file:
+        with open(self._test1_path, "rb") as test1_file:
             session = usbmon.pcapng.parse_stream(test1_file)
             self.assertLen(list(session), 16)

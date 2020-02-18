@@ -26,10 +26,8 @@ import construct
 from usbmon import packet, setup
 
 _USB_DEVICE_DESCRIPTOR = construct.Struct(
-    bLength=construct.Const(
-        18, construct.Byte),
-    bDescriptorType=construct.Const(
-        0x01, construct.Byte),
+    bLength=construct.Const(18, construct.Byte),
+    bDescriptorType=construct.Const(0x01, construct.Byte),
     bcdUSB=construct.Int16ub,
     bDeviceClass=construct.Byte,
     bDeviceSubClass=construct.Byte,
@@ -46,13 +44,9 @@ _USB_DEVICE_DESCRIPTOR = construct.Struct(
 
 
 class DeviceDescriptor:
-
     def __init__(
-            self,
-            address: str,
-            index: int,
-            language_id: int,
-            descriptor: bytes):
+        self, address: str, index: int, language_id: int, descriptor: bytes
+    ):
         self._address = address
         self._index = index
         self._language_id = language_id
@@ -102,26 +96,30 @@ class DeviceDescriptor:
 
     def __repr__(self) -> str:
         return (
-            f'<usbmon.descriptors.DeviceDescriptor '
-            f'{self.vendor_id:04x}:{self.product_id:04x}>')
+            f"<usbmon.descriptors.DeviceDescriptor "
+            f"{self.vendor_id:04x}:{self.product_id:04x}>"
+        )
+
 
 def search_device_descriptor(
-        pair: packet.PacketPair) -> Optional[DeviceDescriptor]:
+    pair: packet.PacketPair,
+) -> Optional[DeviceDescriptor]:
     submit = packet.get_submission(pair)
     callback = packet.get_callback(pair)
 
     if (
-            not callback or
-            not submit.setup_packet or
-            not submit.setup_packet.recipient == setup.Recipient.DEVICE or
-            not submit.setup_packet.standard_request == setup.StandardRequest.GET_DESCRIPTOR or
-            not callback.payload
+        not callback
+        or not submit.setup_packet
+        or not submit.setup_packet.recipient == setup.Recipient.DEVICE
+        or not submit.setup_packet.standard_request
+        == setup.StandardRequest.GET_DESCRIPTOR
+        or not callback.payload
     ):
         return None
 
     # Notably, this is not the same as `submit.address` because it should not
     # include the endpoint address for a device description.
-    device_address = f'{submit.busnum}.{submit.devnum}'
+    device_address = f"{submit.busnum}.{submit.devnum}"
 
     # Descriptor index and type are encoded in the wValue field.
     descriptor_index = submit.setup_packet.value & 0xFF
@@ -129,8 +127,10 @@ def search_device_descriptor(
 
     if descriptor_type != 0x01:
         logging.debug(
-            'invalid GET_DESCRIPTION setup packet (%s): %r',
-            submit.tag, submit.setup_packet)
+            "invalid GET_DESCRIPTION setup packet (%s): %r",
+            submit.tag,
+            submit.setup_packet,
+        )
         return None
 
     try:
@@ -138,9 +138,10 @@ def search_device_descriptor(
             device_address,
             descriptor_index,
             submit.setup_packet.index,
-            callback.payload)
+            callback.payload,
+        )
     except construct.core.StreamError as parse_error:
         logging.debug(
-            'invalid device descriptor (%s): %s',
-            submit.tag, parse_error)
+            "invalid device descriptor (%s): %s", submit.tag, parse_error
+        )
         return None

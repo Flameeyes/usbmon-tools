@@ -26,40 +26,39 @@ import usbmon.capture.usbmon_mmap
 import usbmon.capture_session
 
 _SESSION_BASE64 = (
-    'AKrN2gAAAABTAoACAQAAPMUvaFwAAAAAIsoBAI3///8oAAAAAAAAAIAGAAEAACgAAAAAAAAAAAAAAgAAAAAAAA==',
-    'AKrN2gAAAABDAoACAQAtAMUvaFwAAAAAUdABAAAAAAASAAAAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAABIBAAIAAAAIbgX/AAABAQIAAQ==',
-    'AKrN2gAAAABTAoABAQAAPMUvaFwAAAAAuNIBAI3///8oAAAAAAAAAIAGAAEAACgAAAAAAAAAAAAAAgAAAAAAAA==',
-    'AKrN2gAAAABDAoABAQAtAMUvaFwAAAAAX9MBAAAAAAASAAAAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAABIBAAIJAAFAax0CABQEAwIBAQ==',
-    'gLi22gAAAABDAYECAQAtAMgvaFwAAAAAskoEAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEgAAAAAAAA',
-    'gLi22gAAAABTAYECAQAtPMgvaFwAAAAAS0sEAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==',
-    'gLi22gAAAABDAYECAQAtAMgvaFwAAAAAdUYGAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEAAAAAAAAA',
-    'gLi22gAAAABTAYECAQAtPMgvaFwAAAAAC0cGAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==',
-    'gLi22gAAAABDAYECAQAtAMgvaFwAAAAAS9oKAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAFAAAAAAAAA',
-    'gLi22gAAAABTAYECAQAtPMgvaFwAAAAA5doKAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==',
-    'gLi22gAAAABDAYECAQAtAMgvaFwAAAAAI/0MAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEAAAAAAAAA',
-    'gLi22gAAAABTAYECAQAtPMgvaFwAAAAAuf0MAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==',
-    'gLi22gAAAABDAYECAQAtAMkvaFwAAAAAitkBAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAGAAAAAAAAA',
-    'gLi22gAAAABTAYECAQAtPMkvaFwAAAAAJNoBAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==',
-    'gLi22gAAAABDAYECAQAtAMkvaFwAAAAAYfwDAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEAAAAAAAAA',
-    'gLi22gAAAABTAYECAQAtPMkvaFwAAAAA9/wDAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==',
+    "AKrN2gAAAABTAoACAQAAPMUvaFwAAAAAIsoBAI3///8oAAAAAAAAAIAGAAEAACgAAAAAAAAAAAAAAgAAAAAAAA==",
+    "AKrN2gAAAABDAoACAQAtAMUvaFwAAAAAUdABAAAAAAASAAAAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAABIBAAIAAAAIbgX/AAABAQIAAQ==",
+    "AKrN2gAAAABTAoABAQAAPMUvaFwAAAAAuNIBAI3///8oAAAAAAAAAIAGAAEAACgAAAAAAAAAAAAAAgAAAAAAAA==",
+    "AKrN2gAAAABDAoABAQAtAMUvaFwAAAAAX9MBAAAAAAASAAAAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAABIBAAIJAAFAax0CABQEAwIBAQ==",
+    "gLi22gAAAABDAYECAQAtAMgvaFwAAAAAskoEAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEgAAAAAAAA",
+    "gLi22gAAAABTAYECAQAtPMgvaFwAAAAAS0sEAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==",
+    "gLi22gAAAABDAYECAQAtAMgvaFwAAAAAdUYGAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEAAAAAAAAA",
+    "gLi22gAAAABTAYECAQAtPMgvaFwAAAAAC0cGAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==",
+    "gLi22gAAAABDAYECAQAtAMgvaFwAAAAAS9oKAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAFAAAAAAAAA",
+    "gLi22gAAAABTAYECAQAtPMgvaFwAAAAA5doKAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==",
+    "gLi22gAAAABDAYECAQAtAMgvaFwAAAAAI/0MAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEAAAAAAAAA",
+    "gLi22gAAAABTAYECAQAtPMgvaFwAAAAAuf0MAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==",
+    "gLi22gAAAABDAYECAQAtAMkvaFwAAAAAitkBAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAGAAAAAAAAA",
+    "gLi22gAAAABTAYECAQAtPMkvaFwAAAAAJNoBAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==",
+    "gLi22gAAAABDAYECAQAtAMkvaFwAAAAAYfwDAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEAAAAAAAAA",
+    "gLi22gAAAABTAYECAQAtPMkvaFwAAAAA9/wDAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==",
 )
 
 
 class SessionTest(absltest.TestCase):
-
     def test_retag(self):
         session = usbmon.capture_session.Session(retag_urbs=True)
 
         for base64_packet in _SESSION_BASE64:
             packet = usbmon.capture.usbmon_mmap.UsbmonMmapPacket(
-                '<', binascii.a2b_base64(base64_packet))
+                "<", binascii.a2b_base64(base64_packet)
+            )
             session.add(packet)
 
         self.assertLen(list(session), 16)
 
         # Make sure that each URB tag only exists once.
-        tag_counts = collections.Counter(
-            (package.tag for package in session))
+        tag_counts = collections.Counter((package.tag for package in session))
         self.assertCountEqual([2] * 8, tag_counts.values())
 
     def test_noretag(self):
@@ -67,14 +66,14 @@ class SessionTest(absltest.TestCase):
 
         for base64_packet in _SESSION_BASE64:
             packet = usbmon.capture.usbmon_mmap.UsbmonMmapPacket(
-                '<', binascii.a2b_base64(base64_packet))
+                "<", binascii.a2b_base64(base64_packet)
+            )
             session.add(packet)
 
         self.assertLen(list(session), 16)
 
         # Make sure that each URB tag only exists once.
-        tag_counts = collections.Counter(
-            (package.tag for package in session))
+        tag_counts = collections.Counter((package.tag for package in session))
         self.assertCountEqual([4, 12], tag_counts.values())
 
     def test_incomplete(self):
@@ -84,7 +83,8 @@ class SessionTest(absltest.TestCase):
         incomplete_session = _SESSION_BASE64[1:-1]
         for base64_packet in incomplete_session:
             packet = usbmon.capture.usbmon_mmap.UsbmonMmapPacket(
-                '<', binascii.a2b_base64(base64_packet))
+                "<", binascii.a2b_base64(base64_packet)
+            )
             session.add(packet)
 
         self.assertLen(list(session), 14)
@@ -92,14 +92,14 @@ class SessionTest(absltest.TestCase):
 
 
 class ConstructedSessionTest(absltest.TestCase):
-
     def setUp(self):
         super().setUp()
         self.session = usbmon.capture_session.Session(retag_urbs=True)
 
         for base64_packet in _SESSION_BASE64:
             packet = usbmon.capture.usbmon_mmap.UsbmonMmapPacket(
-                '<', binascii.a2b_base64(base64_packet))
+                "<", binascii.a2b_base64(base64_packet)
+            )
             self.session.add(packet)
 
     def test_device_descriptors(self):

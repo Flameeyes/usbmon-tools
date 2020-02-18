@@ -21,9 +21,9 @@ import enum
 
 @enum.unique
 class PacketType(enum.Enum):
-    SUBMISSION = 'S'
-    CALLBACK = 'C'
-    ERROR = 'E'
+    SUBMISSION = "S"
+    CALLBACK = "C"
+    ERROR = "E"
 
 
 @enum.unique
@@ -36,5 +36,5 @@ class XferType(enum.IntEnum):
 
 @enum.unique
 class Direction(enum.Enum):
-    OUT = 'o'
-    IN = 'i'
+    OUT = "o"
+    IN = "i"

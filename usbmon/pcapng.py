@@ -32,8 +32,7 @@ _SUPPORTED_LINKTYPES = (
 )
 
 
-def parse_file(
-        path: str, retag_urbs: bool = True) -> capture_session.Session:
+def parse_file(path: str, retag_urbs: bool = True) -> capture_session.Session:
     """Parse the provided pcang file path into a Session object.
 
     Args:
@@ -43,12 +42,13 @@ def parse_file(
     Returns:
       A usbmon.capture_session.Session object.
     """
-    with open(path, 'rb') as pcap_file:
+    with open(path, "rb") as pcap_file:
         return parse_stream(pcap_file, retag_urbs)
 
 
 def parse_bytes(
-        data: bytes, retag_urbs: bool = True) -> capture_session.Session:
+    data: bytes, retag_urbs: bool = True
+) -> capture_session.Session:
     """Parse the provided bytes array into a Session object.
 
     Args:
@@ -62,7 +62,8 @@ def parse_bytes(
 
 
 def parse_stream(
-        stream: BinaryIO, retag_urbs: bool = True) -> capture_session.Session:
+    stream: BinaryIO, retag_urbs: bool = True
+) -> capture_session.Session:
     """Parse the provided binary stream into a Session object.
 
     Args:
@@ -83,15 +84,20 @@ def parse_stream(
         elif isinstance(block, pcapng.blocks.InterfaceDescription):
             if block.link_type not in _SUPPORTED_LINKTYPES:
                 raise Exception(
-                    f"Expected USB capture, found {block.link_type_description}.")
+                    f"Expected USB capture, found {block.link_type_description}."
+                )
             link_type = block.link_type
         elif isinstance(block, pcapng.blocks.EnhancedPacket):
             assert block.interface_id == 0
             assert endianness is not None
             assert link_type is not None
-            if link_type == pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED:
+            if (
+                link_type
+                == pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED
+            ):
                 parsed_packet = usbmon_mmap.UsbmonMmapPacket(
-                        endianness, block.packet_data)
+                    endianness, block.packet_data
+                )
             elif link_type == 249:
                 parsed_packet = usbpcap.UsbpcapPacket(block)
 

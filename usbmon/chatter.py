@@ -23,16 +23,16 @@ import hexdump
 from usbmon import constants, packet
 
 _DIRECTION_TO_PREFIX = {
-    constants.Direction.OUT: 'H>>D ',
-    constants.Direction.IN: 'H<<D ',
+    constants.Direction.OUT: "H>>D ",
+    constants.Direction.IN: "H<<D ",
 }
 
 
 def dump_bytes(
-        direction: constants.Direction,
-        payload: bytes,
-        prefix: Optional[str] = None,
-        print_empty: bool = False,
+    direction: constants.Direction,
+    payload: bytes,
+    prefix: Optional[str] = None,
+    print_empty: bool = False,
 ) -> str:
     """Return a "chatter" string for the provided payload.
 
@@ -52,19 +52,18 @@ def dump_bytes(
     line_prefix = _DIRECTION_TO_PREFIX[direction]
 
     if prefix:
-        line_prefix = f'{prefix} {line_prefix}'
+        line_prefix = f"{prefix} {line_prefix}"
 
     if not payload:
         if not print_empty:
-            return ''
+            return ""
         else:
             # This is tricky, hexdump does not actually do what we want it to,
             # so we fake it.
-            return f'{line_prefix}00000000:'
+            return f"{line_prefix}00000000:"
 
     hexd = hexdump.dumpgen(payload)
-    return '\n'.join(
-        ''.join((line_prefix, hexrow)) for hexrow in hexd)
+    return "\n".join("".join((line_prefix, hexrow)) for hexrow in hexd)
 
 
 def dump_packet(packet: packet.Packet, **kwargs) -> str:

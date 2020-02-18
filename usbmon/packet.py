@@ -22,15 +22,16 @@ from typing import Optional, Tuple
 
 from usbmon import constants, setup
 
-PacketPair = Tuple['Packet', Optional['Packet']]
+PacketPair = Tuple["Packet", Optional["Packet"]]
 
 
 _XFERTYPE_TO_MNEMONIC = {
-    constants.XferType.ISOCHRONOUS: 'Z',
-    constants.XferType.INTERRUPT: 'I',
-    constants.XferType.CONTROL: 'C',
-    constants.XferType.BULK: 'B',
+    constants.XferType.ISOCHRONOUS: "Z",
+    constants.XferType.INTERRUPT: "I",
+    constants.XferType.CONTROL: "C",
+    constants.XferType.BULK: "B",
 }
+
 
 class Packet(abc.ABC):
 
@@ -61,7 +62,7 @@ class Packet(abc.ABC):
 
     @property
     def address(self) -> str:
-        return f'{self.busnum}.{self.devnum}.{self.endpoint}'
+        return f"{self.busnum}.{self.devnum}.{self.endpoint}"
 
     @property
     def type_mnemonic(self) -> str:
@@ -69,8 +70,9 @@ class Packet(abc.ABC):
 
     def __repr__(self) -> str:
         return (
-            f'<{type(self).__name__} type: {self.type} tag: {self.tag}'
-            f' address: {self.address!r} payload: {self.payload!r}>')
+            f"<{type(self).__name__} type: {self.type} tag: {self.tag}"
+            f" address: {self.address!r} payload: {self.payload!r}>"
+        )
 
 
 def get_submission(pair: PacketPair):
@@ -80,12 +82,14 @@ def get_submission(pair: PacketPair):
     else:
         return second
 
+
 def get_callback(pair: PacketPair):
     first, second = pair
     if first.type == constants.PacketType.CALLBACK:
         return first
     else:
         return second
+
 
 def get_error(pair: PacketPair):
     first, second = pair

@@ -25,13 +25,17 @@ import usbmon.pcapng
 def main():
     if sys.version_info < (3, 7):
         raise Exception(
-            'Unsupported Python version, please use at least Python 3.7.')
+            "Unsupported Python version, please use at least Python 3.7."
+        )
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        'pcap_file', action='store', type=str,
-        help='Path to the pcapng file with the USB capture.')
+        "pcap_file",
+        action="store",
+        type=str,
+        help="Path to the pcapng file with the USB capture.",
+    )
 
     args = parser.parse_args()
 
@@ -46,26 +50,26 @@ def main():
         addresses_counter[packet.address] += 1
         xfer_type_counter[packet.xfer_type] += 1
 
-    print('Identified descriptors:')
+    print("Identified descriptors:")
 
-    print(' Devices')
+    print(" Devices")
     for address, descriptor in session.device_descriptors.items():
-        print(f'   {address}: {descriptor!r}')
+        print(f"   {address}: {descriptor!r}")
 
     print()
 
-    print('Packet Counters:')
-    print(' Per direction:')
+    print("Packet Counters:")
+    print(" Per direction:")
     for key, count in direction_counter.items():
-        print(f'  {key!s}: {count}')
+        print(f"  {key!s}: {count}")
 
-    print(' Per address:')
+    print(" Per address:")
     for key, count in addresses_counter.items():
-        print(f'  {key!s}: {count}')
+        print(f"  {key!s}: {count}")
 
-    print(' Per transfer type:')
+    print(" Per transfer type:")
     for key, count in xfer_type_counter.items():
-        print(f'  {key!s}: {count}')
+        print(f"  {key!s}: {count}")
 
 
 if __name__ == "__main__":

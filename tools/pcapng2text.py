@@ -42,28 +42,46 @@ import usbmon.pcapng
 def main():
     if sys.version_info < (3, 7):
         raise Exception(
-            'Unsupported Python version, please use at least Python 3.7.')
+            "Unsupported Python version, please use at least Python 3.7."
+        )
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '--addr_prefix', action='store', type=str, default='',
-        help=('Prefix match applied to the device address in text format. '
-              'Only packets with source or destination matching this prefix '
-              'will be printed out.'))
+        "--addr_prefix",
+        action="store",
+        type=str,
+        default="",
+        help=(
+            "Prefix match applied to the device address in text format. "
+            "Only packets with source or destination matching this prefix "
+            "will be printed out."
+        ),
+    )
 
     parser.add_argument(
-        '--retag_urbs', action='store_true', dest='retag_urbs',
-        help=('Apply new, unique tags to the URBs when converting to text '
-              'format. This works around the lack of unique keys in the '
-              'captures.'))
+        "--retag_urbs",
+        action="store_true",
+        dest="retag_urbs",
+        help=(
+            "Apply new, unique tags to the URBs when converting to text "
+            "format. This works around the lack of unique keys in the "
+            "captures."
+        ),
+    )
     parser.add_argument(
-        '--noretag_urbs', action='store_false', dest='retag_urbs',
-        help='Keep original URB tags on the capture.')
+        "--noretag_urbs",
+        action="store_false",
+        dest="retag_urbs",
+        help="Keep original URB tags on the capture.",
+    )
 
     parser.add_argument(
-        'pcap_file', action='store', type=str,
-        help='Path to the pcapng file with the USB capture.')
+        "pcap_file",
+        action="store",
+        type=str,
+        help="Path to the pcapng file with the USB capture.",
+    )
 
     args = parser.parse_args()
 
@@ -72,6 +90,7 @@ def main():
         if not packet.address.startswith(args.addr_prefix):
             continue
         print(str(packet))
+
 
 if __name__ == "__main__":
     main()

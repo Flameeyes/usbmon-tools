@@ -29,7 +29,6 @@ _MAX_CALLBACK_ANTICIPATION = datetime.timedelta(seconds=0.2)
 
 
 class Session:
-
     def __init__(self, retag_urbs: bool = True):
         """Initialize the capture session.
 
@@ -41,10 +40,11 @@ class Session:
         self._retag_urbs: bool = retag_urbs
 
         self._device_descriptors: Optional[
-            Dict[str, descriptors.DeviceDescriptor]] = None
+            Dict[str, descriptors.DeviceDescriptor]
+        ] = None
 
     def _append(
-            self, first: packet.Packet, second: Optional[packet.Packet]
+        self, first: packet.Packet, second: Optional[packet.Packet]
     ) -> None:
         if self._retag_urbs:
             # Totally random UUID, is more useful than the original URB ID.  We
@@ -70,11 +70,16 @@ class Session:
             # maintained by Linux, there may be false matches. To reduce the
             # likeliness of it, reject C events arriving more than 200ms before
             # their matching S event.
-            if (first.type == constants.PacketType.CALLBACK and
-                time_distance > _MAX_CALLBACK_ANTICIPATION):
+            if (
+                first.type == constants.PacketType.CALLBACK
+                and time_distance > _MAX_CALLBACK_ANTICIPATION
+            ):
                 logging.debug(
-                    'Callback (%r) arrived long before submit (%r): %s',
-                    first, packet, time_distance)
+                    "Callback (%r) arrived long before submit (%r): %s",
+                    first,
+                    packet,
+                    time_distance,
+                )
                 self._append(first, None)
                 self._submitted_packets[packet.tag] = packet
             else:
@@ -98,7 +103,8 @@ class Session:
         """Yield the packets in their timestamp order."""
         yield from sorted(
             filter(None, itertools.chain(*self.in_pairs())),
-            key=lambda x: x.timestamp)
+            key=lambda x: x.timestamp,
+        )
 
     def __iter__(self) -> Generator[packet.Packet, None, None]:
         return self.in_order()

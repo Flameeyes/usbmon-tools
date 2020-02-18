@@ -25,37 +25,38 @@ import usbmon.capture.usbmon_mmap
 import usbmon.descriptors
 
 _GET_DEVICE_DESCRIPTOR_PAIR = (
-    'AKrN2gAAAABTAoACAQAAPMUvaFwAAAAAIsoBAI3///8oAAAAAAAAAIAGAAEAACgAAAAAAAAAAAAAAgAAAAAAAA==',
-    'AKrN2gAAAABDAoACAQAtAMUvaFwAAAAAUdABAAAAAAASAAAAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAABIBAAIAAAAIbgX/AAABAQIAAQ==',
+    "AKrN2gAAAABTAoACAQAAPMUvaFwAAAAAIsoBAI3///8oAAAAAAAAAIAGAAEAACgAAAAAAAAAAAAAAgAAAAAAAA==",
+    "AKrN2gAAAABDAoACAQAtAMUvaFwAAAAAUdABAAAAAAASAAAAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAABIBAAIAAAAIbgX/AAABAQIAAQ==",
 )
 
 _OTHER_PAIR = (
-    'gLi22gAAAABDAYECAQAtAMgvaFwAAAAAskoEAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEgAAAAAAAA',
-    'gLi22gAAAABTAYECAQAtPMgvaFwAAAAAS0sEAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==',
+    "gLi22gAAAABDAYECAQAtAMgvaFwAAAAAskoEAAAAAAAIAAAACAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAAEgAAAAAAAA",
+    "gLi22gAAAABTAYECAQAtPMgvaFwAAAAAS0sEAI3///8IAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAEAgAAAAAAAA==",
 )
 
 
 def _get_packets(base64_packets):
     return tuple(
         usbmon.capture.usbmon_mmap.UsbmonMmapPacket(
-            '<', binascii.a2b_base64(packet))
-        for packet in base64_packets)
+            "<", binascii.a2b_base64(packet)
+        )
+        for packet in base64_packets
+    )
 
 
 class DescriptorsTest(absltest.TestCase):
-
     def test_device_descriptor(self):
         packet_pair = _get_packets(_GET_DEVICE_DESCRIPTOR_PAIR)
 
         descriptor = usbmon.descriptors.search_device_descriptor(packet_pair)
         self.assertIsNotNone(descriptor)
 
-        self.assertEqual(descriptor.address, '1.2')
+        self.assertEqual(descriptor.address, "1.2")
         self.assertEqual(descriptor.language_id, 0)
         self.assertEqual(descriptor.index, 0)
 
-        self.assertEqual(descriptor.vendor_id, 0x056e)
-        self.assertEqual(descriptor.product_id, 0x00ff)
+        self.assertEqual(descriptor.vendor_id, 0x056E)
+        self.assertEqual(descriptor.product_id, 0x00FF)
 
     def test_no_descriptor(self):
         packet_pair = _get_packets(_OTHER_PAIR)

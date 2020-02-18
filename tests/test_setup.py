@@ -23,21 +23,22 @@ from absl.testing import absltest
 
 import usbmon.setup
 
-setup_packet = b'\x80\x06\x00\x01\x00\x00\x28\x00'
+setup_packet = b"\x80\x06\x00\x01\x00\x00\x28\x00"
 
 
 class SetupTest(absltest.TestCase):
-
     def test_setup_packet(self):
         setup = usbmon.setup.SetupPacket(setup_packet)
 
-        self.assertEqual(str(setup), 's 80 06 0100 0000 0028')
+        self.assertEqual(str(setup), "s 80 06 0100 0000 0028")
         self.assertEqual(
-            repr(setup), '<usbmon.setup.SetupPacket 8006000100002800>')
+            repr(setup), "<usbmon.setup.SetupPacket 8006000100002800>"
+        )
 
         self.assertEqual(setup.raw, setup_packet)
         self.assertEqual(setup.type, usbmon.setup.Type.STANDARD)
         self.assertEqual(
-            setup.standard_request, usbmon.setup.StandardRequest.GET_DESCRIPTOR)
+            setup.standard_request, usbmon.setup.StandardRequest.GET_DESCRIPTOR
+        )
 
         self.assertEqual(setup.direction, usbmon.setup.Direction.DEVICE_TO_HOST)

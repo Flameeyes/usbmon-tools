@@ -24,53 +24,49 @@ import usbmon.constants
 
 
 class DumpBytesTest(absltest.TestCase):
-
     def test_simple(self):
         self.assertEqual(
             usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.IN,
-                b'\x01\x02\x03'),
-            'H<<D 00000000: 01 02 03                                          ...')
+                usbmon.constants.Direction.IN, b"\x01\x02\x03"
+            ),
+            "H<<D 00000000: 01 02 03                                          ...",
+        )
 
         self.assertEqual(
             usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.OUT,
-                b'\x01\x02\x03'),
-            'H>>D 00000000: 01 02 03                                          ...')
+                usbmon.constants.Direction.OUT, b"\x01\x02\x03"
+            ),
+            "H>>D 00000000: 01 02 03                                          ...",
+        )
 
     def test_empty(self):
         self.assertEqual(
-            usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.OUT,
-                b''),
-            '')
+            usbmon.chatter.dump_bytes(usbmon.constants.Direction.OUT, b""), ""
+        )
 
     def test_print_empty(self):
         self.assertEqual(
             usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.OUT,
-                b'',
-                print_empty=True,
+                usbmon.constants.Direction.OUT, b"", print_empty=True,
             ),
-            'H>>D 00000000:'
+            "H>>D 00000000:",
         )
 
     def test_custom_prefix(self):
         self.assertEqual(
             usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.IN,
-                b'\x01\x02\x03',
-                prefix='pfx',
+                usbmon.constants.Direction.IN, b"\x01\x02\x03", prefix="pfx",
             ),
-            'pfx H<<D 00000000: 01 02 03                                          ...')
+            "pfx H<<D 00000000: 01 02 03                                          ...",
+        )
 
     def test_custom_prefix_empty(self):
         self.assertEqual(
             usbmon.chatter.dump_bytes(
                 usbmon.constants.Direction.OUT,
-                b'',
-                prefix='pfx',
+                b"",
+                prefix="pfx",
                 print_empty=True,
             ),
-            'pfx H>>D 00000000:'
+            "pfx H>>D 00000000:",
         )

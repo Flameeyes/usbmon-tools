@@ -25,16 +25,17 @@ import usbmon.pcapng
 
 
 class TestUsbpcap(absltest.TestCase):
-
     def test_parse(self):
         session = usbmon.pcapng.parse_file(
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
-                'testdata/usbpcap1.pcap'))
+                "testdata/usbpcap1.pcap",
+            )
+        )
         self.assertLen(list(session), 498)
 
         self.assertLen(session.device_descriptors, 1)
 
-        device_descriptor, = session.device_descriptors.values()
-        self.assertEqual(device_descriptor.address, '1.1')
+        (device_descriptor,) = session.device_descriptors.values()
+        self.assertEqual(device_descriptor.address, "1.1")
         self.assertEqual(device_descriptor.vendor_id, 0x0627)

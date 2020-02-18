@@ -30,22 +30,33 @@ HID_XFER_TYPES = (
     usbmon.constants.XferType.CONTROL,
 )
 
+
 def main():
     if sys.version_info < (3, 7):
         raise Exception(
-            'Unsupported Python version, please use at least Python 3.7.')
+            "Unsupported Python version, please use at least Python 3.7."
+        )
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '--addr_prefix', action='store', type=str, required=True,
-        help=('Prefix match applied to the device address in text format. '
-              'Only packets with source or destination matching this prefix '
-              'will be printed out.'))
+        "--addr_prefix",
+        action="store",
+        type=str,
+        required=True,
+        help=(
+            "Prefix match applied to the device address in text format. "
+            "Only packets with source or destination matching this prefix "
+            "will be printed out."
+        ),
+    )
 
     parser.add_argument(
-        'pcap_file', action='store', type=str,
-        help='Path to the pcapng file with the USB capture.')
+        "pcap_file",
+        action="store",
+        type=str,
+        help="Path to the pcapng file with the USB capture.",
+    )
 
     args = parser.parse_args()
 
@@ -58,7 +69,7 @@ def main():
             # We don't care which one is missing, we can just get the first
             # packet's tag. If there's an ERROR packet, it'll also behave as we
             # want it to.
-            logging.debug('Ignoring singleton packet: %s' % pair[0].tag)
+            logging.debug("Ignoring singleton packet: %s" % pair[0].tag)
             continue
 
         if not submission.address.startswith(args.addr_prefix):
@@ -67,9 +78,11 @@ def main():
 
         if submission.xfer_type == usbmon.constants.XferType.INTERRUPT:
             pass
-        elif (submission.xfer_type == usbmon.constants.XferType.CONTROL and
-              submission.setup_packet and
-              submission.setup_packet.type == usbmon.setup.Type.CLASS):
+        elif (
+            submission.xfer_type == usbmon.constants.XferType.CONTROL
+            and submission.setup_packet
+            and submission.setup_packet.type == usbmon.setup.Type.CLASS
+        ):
             pass
         else:
             continue
@@ -80,7 +93,7 @@ def main():
             dumped_packet = callback
 
         if dumped_packet.payload:
-            print(usbmon.chatter.dump_packet(dumped_packet), '\n')
+            print(usbmon.chatter.dump_packet(dumped_packet), "\n")
 
 
 if __name__ == "__main__":
