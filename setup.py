@@ -29,7 +29,7 @@ setup(
     version="1",
     description="Linux usbmon processing utilities.",
     author="Diego Elio Pettenò",
-    author_email="flameeyes@flameeyes.eu",
+    author_email="flameeyes@flameeyes.com",
     python_requires="~=3.7",
     classifiers=[
         "Programming Language :: Python",
