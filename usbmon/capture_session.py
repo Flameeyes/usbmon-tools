@@ -43,9 +43,7 @@ class Session:
             Dict[str, descriptors.DeviceDescriptor]
         ] = None
 
-    def _append(
-        self, first: packet.Packet, second: Optional[packet.Packet]
-    ) -> None:
+    def _append(self, first: packet.Packet, second: Optional[packet.Packet]) -> None:
         if self._retag_urbs:
             # Totally random UUID, is more useful than the original URB ID.  We
             # take the hex string format, because that complies with the usbmon
@@ -102,8 +100,7 @@ class Session:
     def in_order(self) -> Generator[packet.Packet, None, None]:
         """Yield the packets in their timestamp order."""
         yield from sorted(
-            filter(None, itertools.chain(*self.in_pairs())),
-            key=lambda x: x.timestamp,
+            filter(None, itertools.chain(*self.in_pairs())), key=lambda x: x.timestamp,
         )
 
     def __iter__(self) -> Generator[packet.Packet, None, None]:

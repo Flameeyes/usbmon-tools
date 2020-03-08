@@ -26,9 +26,7 @@ import pcapng
 
 def main():
     if sys.version_info < (3, 7):
-        raise Exception(
-            "Unsupported Python version, please use at least Python 3.7."
-        )
+        raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
     parser = argparse.ArgumentParser()
 
@@ -59,9 +57,7 @@ def main():
             elif isinstance(block, pcapng.blocks.EnhancedPacket):
                 assert block.interface_id == 0
                 _, _, payload = block.packet_payload_info
-                print(
-                    binascii.b2a_base64(payload, newline=False).decode("ascii")
-                )
+                print(binascii.b2a_base64(payload, newline=False).decode("ascii"))
 
 
 if __name__ == "__main__":

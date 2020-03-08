@@ -21,7 +21,6 @@ import io
 from typing import BinaryIO, Optional
 
 import pcapng
-
 from usbmon import capture_session, packet
 from usbmon.capture import usbmon_mmap, usbpcap
 
@@ -46,9 +45,7 @@ def parse_file(path: str, retag_urbs: bool = True) -> capture_session.Session:
         return parse_stream(pcap_file, retag_urbs)
 
 
-def parse_bytes(
-    data: bytes, retag_urbs: bool = True
-) -> capture_session.Session:
+def parse_bytes(data: bytes, retag_urbs: bool = True) -> capture_session.Session:
     """Parse the provided bytes array into a Session object.
 
     Args:
@@ -61,9 +58,7 @@ def parse_bytes(
     return parse_stream(io.BytesIO(data), retag_urbs)
 
 
-def parse_stream(
-    stream: BinaryIO, retag_urbs: bool = True
-) -> capture_session.Session:
+def parse_stream(stream: BinaryIO, retag_urbs: bool = True) -> capture_session.Session:
     """Parse the provided binary stream into a Session object.
 
     Args:
@@ -91,10 +86,7 @@ def parse_stream(
             assert block.interface_id == 0
             assert endianness is not None
             assert link_type is not None
-            if (
-                link_type
-                == pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED
-            ):
+            if link_type == pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED:
                 parsed_packet = usbmon_mmap.UsbmonMmapPacket(
                     endianness, block.packet_data
                 )

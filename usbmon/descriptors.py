@@ -22,7 +22,6 @@ import logging
 from typing import Any, Optional
 
 import construct
-
 from usbmon import packet, setup
 
 _USB_DEVICE_DESCRIPTOR = construct.Struct(
@@ -44,9 +43,7 @@ _USB_DEVICE_DESCRIPTOR = construct.Struct(
 
 
 class DeviceDescriptor:
-    def __init__(
-        self, address: str, index: int, language_id: int, descriptor: bytes
-    ):
+    def __init__(self, address: str, index: int, language_id: int, descriptor: bytes):
         self._address = address
         self._index = index
         self._language_id = language_id
@@ -101,9 +98,7 @@ class DeviceDescriptor:
         )
 
 
-def search_device_descriptor(
-    pair: packet.PacketPair,
-) -> Optional[DeviceDescriptor]:
+def search_device_descriptor(pair: packet.PacketPair,) -> Optional[DeviceDescriptor]:
     submit = packet.get_submission(pair)
     callback = packet.get_callback(pair)
 
@@ -141,7 +136,5 @@ def search_device_descriptor(
             callback.payload,
         )
     except construct.core.StreamError as parse_error:
-        logging.debug(
-            "invalid device descriptor (%s): %s", submit.tag, parse_error
-        )
+        logging.debug("invalid device descriptor (%s): %s", submit.tag, parse_error)
         return None

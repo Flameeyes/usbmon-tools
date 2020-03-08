@@ -17,25 +17,20 @@
 # SPDX-License-Identifier: Apache-2.0
 """Tests for usbmon.chatter."""
 
-from absl.testing import absltest
-
 import usbmon.chatter
 import usbmon.constants
+from absl.testing import absltest
 
 
 class DumpBytesTest(absltest.TestCase):
     def test_simple(self):
         self.assertEqual(
-            usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.IN, b"\x01\x02\x03"
-            ),
+            usbmon.chatter.dump_bytes(usbmon.constants.Direction.IN, b"\x01\x02\x03"),
             "H<<D 00000000: 01 02 03                                          ...",
         )
 
         self.assertEqual(
-            usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.OUT, b"\x01\x02\x03"
-            ),
+            usbmon.chatter.dump_bytes(usbmon.constants.Direction.OUT, b"\x01\x02\x03"),
             "H>>D 00000000: 01 02 03                                          ...",
         )
 
@@ -63,10 +58,7 @@ class DumpBytesTest(absltest.TestCase):
     def test_custom_prefix_empty(self):
         self.assertEqual(
             usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.OUT,
-                b"",
-                prefix="pfx",
-                print_empty=True,
+                usbmon.constants.Direction.OUT, b"", prefix="pfx", print_empty=True,
             ),
             "pfx H>>D 00000000:",
         )

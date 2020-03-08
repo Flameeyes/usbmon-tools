@@ -23,10 +23,8 @@ import logging
 import construct
 import hexdump
 import pcapng
+from usbmon import constants, packet, setup
 
-from usbmon import constants
-from usbmon import packet
-from usbmon import setup
 
 @enum.unique
 class ControlStage(enum.IntEnum):
@@ -46,36 +44,37 @@ _STRUCT = construct.Struct(
     devnum=construct.Int16ul,
     epnum=construct.Byte,
     xfer_type=construct.Mapping(
-        construct.Byte,
-        {e: e.value for e in constants.XferType}),
+        construct.Byte, {e: e.value for e in constants.XferType}
+    ),
     dataLength=construct.Int32ul,
     # Start of additional headers.
     control_header=construct.If(
         construct.this.xfer_type == constants.XferType.CONTROL,
         construct.Struct(
             control_stage=construct.Mapping(
-                construct.Byte,
-                {e: e.value for e in ControlStage}),
+                construct.Byte, {e: e.value for e in ControlStage}
+            ),
             setup_packet=construct.If(
-                construct.this.control_stage == ControlStage.SETUP,
-                construct.Bytes(8)),
-        )),
+                construct.this.control_stage == ControlStage.SETUP, construct.Bytes(8)
+            ),
+        ),
+    ),
     payload=construct.GreedyBytes,
 )
+
 
 class UsbpcapPacket(packet.Packet):
     def __init__(self, block: pcapng.blocks.EnhancedPacket):
         super().__init__()
 
-        self.timestamp = datetime.datetime.fromtimestamp(
-            block.timestamp)
+        self.timestamp = datetime.datetime.fromtimestamp(block.timestamp)
 
         constructed_object = _STRUCT.parse(block.packet_data)
 
         # The binary ID value is usually a pointer in memory. Keep the text
         # representation instead, because it should be considered an opaque
         # value.
-        self.tag = f'{constructed_object.id:08x}'
+        self.tag = f"{constructed_object.id:08x}"
 
         # This appears to be an approximation.
         if constructed_object.info == 0x01:
@@ -96,15 +95,17 @@ class UsbpcapPacket(packet.Packet):
         if self.xfer_type == constants.XferType.CONTROL:
             if constructed_object.control_header.setup_packet:
                 self.setup_packet = setup.SetupPacket(
-                    constructed_object.control_header.setup_packet)
+                    constructed_object.control_header.setup_packet
+                )
                 self.length -= 8  # size of setup packet.
 
         self.epnum = constructed_object.epnum
 
         self.payload = constructed_object.payload
         if self.length != len(self.payload):
-            logging.warning('expected %d bytes, found %d',
-                            self.length, len(self.payload))
+            logging.warning(
+                "expected %d bytes, found %d", self.length, len(self.payload)
+            )
 
     @property
     def setup_packet_string(self) -> str:
@@ -123,14 +124,17 @@ class UsbpcapPacket(packet.Packet):
         # annoyingly seems to cut this at 4-bytes groups.
         if self.payload:
             payload_dump = hexdump.dump(self.payload, size=8).lower()
-            payload_string = f'= {payload_dump}'
-        elif (self.xfer_type == constants.XferType.INTERRUPT and
-              self.direction == constants.Direction.IN):
-            payload_string = '<'
+            payload_string = f"= {payload_dump}"
+        elif (
+            self.xfer_type == constants.XferType.INTERRUPT
+            and self.direction == constants.Direction.IN
+        ):
+            payload_string = "<"
         else:
-            payload_string = '?'
+            payload_string = "?"
 
         return (
-            f'{self.tag} {self.timestamp.timestamp() * 1e6:.0f} '
-            f'{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} '
-            f'{self.setup_packet_string} {self.length} {payload_string}').rstrip()
+            f"{self.tag} {self.timestamp.timestamp() * 1e6:.0f} "
+            f"{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} "
+            f"{self.setup_packet_string} {self.length} {payload_string}"
+        ).rstrip()

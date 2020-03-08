@@ -21,7 +21,6 @@ import sys
 from typing import Optional
 
 import construct
-
 import usbmon
 import usbmon.chatter
 import usbmon.pcapng
@@ -49,9 +48,7 @@ def print_uart_config_packet(packet):
 
 def main():
     if sys.version_info < (3, 7):
-        raise Exception(
-            "Unsupported Python version, please use at least Python 3.7."
-        )
+        raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
     parser = argparse.ArgumentParser()
 
@@ -112,9 +109,7 @@ def main():
 
         if submission.xfer_type == usbmon.constants.XferType.INTERRUPT:
             if submission.direction != direction and reconstructed_packet:
-                print(
-                    usbmon.chatter.dump_bytes(direction, reconstructed_packet)
-                )
+                print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
                 direction = None
                 reconstructed_packet = b""
 
@@ -133,16 +128,10 @@ def main():
                     print("Report: %2x" % report)
         elif submission.xfer_type == usbmon.constants.XferType.CONTROL:
             if submission.payload:
-                if (
-                    submission.payload[0]
-                    == cp2110.ReportId.GET_SET_UART_CONFIG.value
-                ):
+                if submission.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
                     print_uart_config_packet(submission)
             if callback.payload:
-                if (
-                    callback.payload[0]
-                    == cp2110.ReportId.GET_SET_UART_CONFIG.value
-                ):
+                if callback.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
                     print_uart_config_packet(callback)
 
     print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))

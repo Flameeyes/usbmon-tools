@@ -33,9 +33,7 @@ HID_XFER_TYPES = (
 
 def main():
     if sys.version_info < (3, 7):
-        raise Exception(
-            "Unsupported Python version, please use at least Python 3.7."
-        )
+        raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
     parser = argparse.ArgumentParser()
 

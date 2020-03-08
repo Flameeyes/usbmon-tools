@@ -24,9 +24,8 @@ import enum
 
 import construct
 
-
-DEFAULT_VENDOR_ID = 0x10c4  # Silicon Labs
-DEFAULT_PRODUCT_ID = 0xea80
+DEFAULT_VENDOR_ID = 0x10C4  # Silicon Labs
+DEFAULT_PRODUCT_ID = 0xEA80
 
 
 @enum.unique
@@ -56,15 +55,11 @@ class StopBits(enum.IntEnum):
 
 
 UART_CONFIG_STRUCT = construct.Struct(
-    report_id=construct.Const(b'\x50'),
+    report_id=construct.Const(b"\x50"),
     baudrate=construct.Int32ub,
-    parity=construct.Enum(
-        construct.Byte, Parity),
-    flow_control=construct.Enum(
-        construct.Byte, FlowControl),
+    parity=construct.Enum(construct.Byte, Parity),
+    flow_control=construct.Enum(construct.Byte, FlowControl),
     raw_data_bits=construct.Byte,
-    data_bits=construct.Computed(
-        construct.this.raw_data_bits + 5),
-    stop_bits=construct.Enum(
-        construct.Byte, StopBits),
+    data_bits=construct.Computed(construct.this.raw_data_bits + 5),
+    stop_bits=construct.Enum(construct.Byte, StopBits),
 )
