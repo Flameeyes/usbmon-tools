@@ -2,9 +2,11 @@ dist: xenial
 
 language: python
 
-python:
-  - 3.7
-  - 3.8
+matrix:
+  include:
+    - python: 3.7
+      env: PRE_COMMIT=true
+    - python: 3.8
 
 install:
   - pip install -r test-requirements.txt
@@ -14,3 +16,4 @@ script:
   - mypy usbmon tools
   - python setup.py bdist_wheel
   - pip install ./dist/usbmon_tools-*.whl
+  - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi
