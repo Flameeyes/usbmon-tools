@@ -19,8 +19,9 @@
 
 import binascii
 
-import usbmon.setup
 from absl.testing import absltest
+
+import usbmon.setup
 
 setup_packet = b"\x80\x06\x00\x01\x00\x00\x28\x00"
 

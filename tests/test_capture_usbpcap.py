@@ -19,8 +19,9 @@
 
 import os
 
-import usbmon.pcapng
 from absl.testing import absltest
+
+import usbmon.pcapng
 
 
 class TestUsbpcap(absltest.TestCase):

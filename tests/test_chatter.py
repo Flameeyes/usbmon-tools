@@ -17,9 +17,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Tests for usbmon.chatter."""
 
+from absl.testing import absltest
+
 import usbmon.chatter
 import usbmon.constants
-from absl.testing import absltest
 
 
 class DumpBytesTest(absltest.TestCase):

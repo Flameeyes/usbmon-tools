@@ -21,6 +21,7 @@ import sys
 from typing import Optional
 
 import construct
+
 import usbmon
 import usbmon.chatter
 import usbmon.pcapng

@@ -22,6 +22,7 @@ from typing import Union
 
 import construct
 import hexdump
+
 from usbmon import constants, packet, setup
 
 

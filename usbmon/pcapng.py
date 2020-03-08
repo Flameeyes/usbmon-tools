@@ -21,6 +21,7 @@ import io
 from typing import BinaryIO, Optional
 
 import pcapng
+
 from usbmon import capture_session, packet
 from usbmon.capture import usbmon_mmap, usbpcap
 

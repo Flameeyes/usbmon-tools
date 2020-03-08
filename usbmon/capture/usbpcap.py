@@ -23,6 +23,7 @@ import logging
 import construct
 import hexdump
 import pcapng
+
 from usbmon import constants, packet, setup
 
 

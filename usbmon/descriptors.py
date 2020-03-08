@@ -22,6 +22,7 @@ import logging
 from typing import Any, Optional
 
 import construct
+
 from usbmon import packet, setup
 
 _USB_DEVICE_DESCRIPTOR = construct.Struct(
