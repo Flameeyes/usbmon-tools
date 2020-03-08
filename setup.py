@@ -27,7 +27,7 @@ with open("test-requirements.txt") as requirements:
 setup(
     name="usbmon-tools",
     version="1",
-    description="Linux usbmon processing utilities.",
+    description="usbmon processing utilities (for Linux and Windows captures).",
     author="Diego Elio Pettenò",
     author_email="flameeyes@flameeyes.com",
     python_requires="~=3.7",
