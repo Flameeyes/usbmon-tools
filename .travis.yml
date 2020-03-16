@@ -9,7 +9,7 @@ matrix:
     - python: 3.8
 
 install:
-  - pip install -r test-requirements.txt
+  - pip install .[dev]
 
 script:
   - py.test -vvv

@@ -21,9 +21,16 @@ import sys
 from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
-with open("test-requirements.txt") as requirements:
-    test_required = requirements.read().splitlines()
-
+test_required = [
+    "absl-py",
+    "construct>=2.9",
+    "hexdump",
+    "mypy",
+    "pre-commit",
+    "pytest-timeout>=1.3.0",
+    "pytest>=3.6.0",
+    "python-pcapng>=1.0",
+]
 
 with open("README.md", "rt") as fh:
     long_description = fh.read()
@@ -50,4 +57,6 @@ setup(
     ],
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests",]),
     install_requires=["construct>=2.9", "hexdump", "python-pcapng>=1.0",],
+    tests_require=test_required,
+    extras_require={"dev": test_required + ["pre-commit"],},
 )
