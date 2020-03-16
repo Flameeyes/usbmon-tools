@@ -28,7 +28,8 @@ class TestUsbpcap(absltest.TestCase):
     def test_parse(self):
         session = usbmon.pcapng.parse_file(
             os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "testdata/usbpcap1.pcap",
+                os.path.dirname(os.path.abspath(__file__)),
+                "../../../testdata/usbpcap1.pcap",
             )
         )
         self.assertLen(list(session), 498)

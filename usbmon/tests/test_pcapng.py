@@ -28,7 +28,7 @@ class PcapTest(absltest.TestCase):
     def setUp(self):
         super().setUp()
         self._test1_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "testdata/test1.pcap"
+            os.path.dirname(os.path.abspath(__file__)), "../../testdata/test1.pcap"
         )
 
     def test_parse_file(self):

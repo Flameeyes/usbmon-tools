@@ -41,6 +41,6 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: System :: Hardware",
     ],
-    packages=find_packages(exclude=["test"],),
+    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests",]),
     install_requires=["construct>=2.9", "hexdump", "python-pcapng>=1.0",],
 )
