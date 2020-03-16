@@ -24,10 +24,17 @@ from setuptools.command.test import test as TestCommand
 with open("test-requirements.txt") as requirements:
     test_required = requirements.read().splitlines()
 
+
+with open("README.md", "rt") as fh:
+    long_description = fh.read()
+
+
 setup(
     name="usbmon-tools",
     version="1",
     description="usbmon processing utilities (for Linux and Windows captures).",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Diego Elio Pettenò",
     author_email="flameeyes@flameeyes.com",
     python_requires="~=3.7",
