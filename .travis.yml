@@ -5,16 +5,18 @@ language: python
 matrix:
   include:
     - python: 3.7
-      env: PRE_COMMIT=true
+      env: PRE_COMMIT=true RUN_MYPY=true
     - python: 3.8
+      env: RUN_MYPY=true
     - python: 3.9-dev
+      env: RUN_MYPY=false
 
 install:
   - pip install .[dev]
 
 script:
   - py.test -vvv
-  - mypy usbmon tools
+  - $RUN_MYPY && mypy usbmon tools
   - python setup.py bdist_wheel
   - pip install ./dist/usbmon_tools-*.whl
   - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi
