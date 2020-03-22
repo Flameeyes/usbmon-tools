@@ -36,6 +36,9 @@ with open("README.md", "rt") as fh:
     long_description = fh.read()
 
 
+all_packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests",])
+
+
 setup(
     name="usbmon-tools",
     version="1",
@@ -55,7 +58,8 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: System :: Hardware",
     ],
-    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests",]),
+    packages=all_packages,
+    package_data={package: ["py.typed"] for package in all_packages},
     install_requires=["construct>=2.9", "hexdump", "python-pcapng>=1.0",],
     tests_require=test_required,
     extras_require={"dev": test_required + ["pre-commit"],},
