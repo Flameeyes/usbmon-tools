@@ -2,6 +2,7 @@
 *.pyc
 *~
 .cache
+.ipynb_checkpoints/
 .mypy_cache/
 /MANIFEST
 /dist/
