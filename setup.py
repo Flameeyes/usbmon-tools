@@ -20,22 +20,20 @@ from setuptools import find_packages, setup
 
 import setuptools_scm  # Ensure it's present.
 
-test_required = [
-    "absl-py",
-    "construct>=2.9",
-    "hexdump",
-    "mypy",
-    "pre-commit",
-    "pytest-timeout>=1.3.0",
-    "pytest>=3.6.0",
-    "python-pcapng>=1.0",
-]
-
 setup(
     python_requires="~=3.7",
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests",]),
     package_data={"": ["py.typed"]},
     install_requires=["construct>=2.9", "hexdump", "python-pcapng>=1.0",],
-    tests_require=test_required,
-    extras_require={"dev": test_required + ["pre-commit", "setuptools_scm"],},
+    extras_require={
+        "dev": [
+            "absl-py",
+            "mypy",
+            "pre-commit",
+            "pre-commit",
+            "pytest-timeout>=1.3.0",
+            "pytest>=3.6.0",
+            "setuptools_scm",
+        ],
+    },
 )
