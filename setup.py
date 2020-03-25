@@ -16,10 +16,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import sys
-
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
 
 import setuptools_scm  # Ensure it's present.
 
@@ -34,33 +31,10 @@ test_required = [
     "python-pcapng>=1.0",
 ]
 
-with open("README.md", "rt") as fh:
-    long_description = fh.read()
-
-
-all_packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests",])
-
-
 setup(
-    name="usbmon-tools",
-    description="usbmon processing utilities (for Linux and Windows captures).",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    author="Diego Elio Pettenò",
-    author_email="flameeyes@flameeyes.com",
     python_requires="~=3.7",
-    classifiers=[
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Development Status :: 4 - Beta",
-        "Environment :: Console",
-        "Operating System :: OS Independent",
-        "License :: OSI Approved :: Apache Software License",
-        "Intended Audience :: Developers",
-        "Topic :: System :: Hardware",
-    ],
-    packages=all_packages,
-    package_data={package: ["py.typed"] for package in all_packages},
+    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests",]),
+    package_data={"": ["py.typed"]},
     install_requires=["construct>=2.9", "hexdump", "python-pcapng>=1.0",],
     tests_require=test_required,
     extras_require={"dev": test_required + ["pre-commit", "setuptools_scm"],},
