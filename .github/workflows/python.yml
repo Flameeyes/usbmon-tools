@@ -23,8 +23,8 @@ jobs:
     steps:
       - name: Install
         run: |
-          pip install --upgrade pip
-          pip install .[dev]
+          python3 -m pip install --upgrade pip
+          python3 -m pip install .[dev]
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: Test
         run: |
-          py.test -vvv
+          python3 -m py.test -vvv
   # Run mypy only on one version of Python, the type-checking applies multiple
   # versions already.
   mypy:
@@ -46,7 +46,7 @@ jobs:
     steps:
       - name: Type Checking
         run: |
-          mypy usbmon tools
+          python3 -m mypy usbmon tools
   # Run pre-commit only on one version of Python, the style and import order are
   # version independent.
   pre-commit:
@@ -58,5 +58,5 @@ jobs:
     steps:
       - name: Pre Commit Checks
         run: |
-          pre-commit --install
-          pre-commit run --all-files
+          python3 -m pre-commit --install
+          python3 -m pre-commit run --all-files
