@@ -1,3 +1,10 @@
+[build-system]
+requires = [
+  'setuptools >= 42',
+  'wheel',
+  'setuptools_scm[toml]>=3.4',
+]
+
 [tool.black]
 line-ngth = 80
 target-version = ['py37']
@@ -5,3 +12,10 @@ target-version = ['py37']
 [tool.isort]
 line_length = 80
 known_third_party = ['absl', 'construct', 'hexdump', 'pcapng']
+
+[tool.setuptools_scm]
+# Until a new version of setuptools_scm with a fix for the following issue is
+# released, override the default configuration here.
+# https://github.com/pypa/setuptools_scm/issues/411
+tag_regex = '^(?:[\w-]+-)?(?P<version>[vV]?\d+(?:\.\d+){0,2}[^\+]*)(?:\+.*)?$'
+git_describe_command = 'git describe --dirty --tags --long --match *[0-9]*'

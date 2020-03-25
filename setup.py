@@ -21,6 +21,8 @@ import sys
 from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
+import setuptools_scm  # Ensure it's present.
+
 test_required = [
     "absl-py",
     "construct>=2.9",
@@ -41,7 +43,6 @@ all_packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"
 
 setup(
     name="usbmon-tools",
-    version="1",
     description="usbmon processing utilities (for Linux and Windows captures).",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -62,5 +63,5 @@ setup(
     package_data={package: ["py.typed"] for package in all_packages},
     install_requires=["construct>=2.9", "hexdump", "python-pcapng>=1.0",],
     tests_require=test_required,
-    extras_require={"dev": test_required + ["pre-commit"],},
+    extras_require={"dev": test_required + ["pre-commit", "setuptools_scm"],},
 )
