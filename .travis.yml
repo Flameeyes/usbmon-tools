@@ -16,6 +16,4 @@ install:
 script:
   - py.test -vvv
   - if [[ $RUN_MYPY != false ]]; then mypy usbmon tools; fi
-  - python setup.py bdist_wheel
-  - pip install ./dist/usbmon_tools-*.whl
   - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi
