@@ -18,13 +18,14 @@
 
 from setuptools import find_packages, setup
 
-import setuptools_scm  # Ensure it's present.
+# Ensure it's present.
+import setuptools_scm  # noqa: F401
 
 setup(
     python_requires="~=3.7",
-    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests",]),
+    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     package_data={"": ["py.typed"]},
-    install_requires=["construct>=2.9", "hexdump", "python-pcapng>=1.0",],
+    install_requires=["construct>=2.9", "hexdump", "python-pcapng>=1.0"],
     extras_require={
         "dev": [
             "absl-py",

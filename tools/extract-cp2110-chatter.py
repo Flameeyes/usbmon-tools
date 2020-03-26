@@ -17,10 +17,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+import logging
 import sys
 from typing import Optional
-
-import construct
 
 import usbmon
 import usbmon.chatter

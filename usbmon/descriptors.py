@@ -17,9 +17,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """Functions to handle descriptor requests."""
 
-import enum
 import logging
-from typing import Any, Optional
+from typing import Optional
 
 import construct
 

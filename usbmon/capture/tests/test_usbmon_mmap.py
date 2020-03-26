@@ -18,7 +18,6 @@
 """Tests for usbmon.capture.usbmon_mmap."""
 
 import binascii
-import errno
 
 from absl.testing import absltest
 

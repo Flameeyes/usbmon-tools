@@ -41,11 +41,8 @@ def main():
 
     with open(args.pcap_file, "rb") as pcap_file:
         scanner = pcapng.FileScanner(pcap_file)
-        endianness = None
         for block in scanner:
-            if isinstance(block, pcapng.blocks.SectionHeader):
-                endianness = block.endianness
-            elif isinstance(block, pcapng.blocks.InterfaceDescription):
+            if isinstance(block, pcapng.blocks.InterfaceDescription):
                 if (
                     block.link_type
                     != pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED

@@ -21,7 +21,7 @@ import datetime
 import itertools
 import logging
 import uuid
-from typing import Dict, Generator, List, Mapping, Optional, Tuple
+from typing import Dict, Generator, List, Mapping, Optional
 
 from usbmon import constants, descriptors, packet
 

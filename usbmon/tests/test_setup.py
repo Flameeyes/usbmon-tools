@@ -17,8 +17,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """Tests for usbmon.setup."""
 
-import binascii
-
 from absl.testing import absltest
 
 import usbmon.setup
