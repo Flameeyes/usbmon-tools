@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# SPDX-FileCopyrightText: © 2019 The usbmon-tools Authors
 # SPDX-License-Identifier: Apache-2.0
 """Support module for Silicon Labs CP2110/4 protocol structures.
 
