@@ -17,3 +17,18 @@ Note that this is not an official Google product.
 In addition to the `usbmon` module, containing the data structures to access USB
 captures, this package contains a few scripts in the `tools/` directory, which
 can be used to manipulate usbmon captures.
+
+## Development
+
+You can see <CONTRIBUTING.md> for the details on contributing to this project.
+
+To set up a development environment, you can use the following commands:
+
+```shell
+$ git clone https://github.com/Flameeyes/usbmon-tools
+$ cd usbmon-tools
+$ python3 -m venv venv
+$ . venv/bin/activate
+$ pip install -e .[dev]  # editable installation
+$ pre-commit install
+```
