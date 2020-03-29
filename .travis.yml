@@ -15,5 +15,5 @@ install:
 
 script:
   - py.test -vvv
-  - if [[ $RUN_MYPY != false ]]; then mypy usbmon tools; fi
+  - if [[ $RUN_MYPY != false ]]; then mypy usbmon; fi
   - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi
