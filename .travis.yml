@@ -6,14 +6,12 @@ matrix:
   include:
     - python: 3.7
     - python: 3.8
-      env: PRE_COMMIT=true
+      env: PRE_COMMIT=true PYTEST_OPTIONS="--mypy --flake8"
     - python: 3.9-dev
-      env: RUN_MYPY=false
 
 install:
   - pip install .[dev]
 
 script:
-  - py.test -vvv
-  - if [[ $RUN_MYPY != false ]]; then mypy usbmon; fi
+  - pytest -vvv $PYTEST_OPTIONS
   - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi
