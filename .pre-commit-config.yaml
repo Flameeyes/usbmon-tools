@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 The usbmon-tools Authors
+#
+# SPDX-License-Identifier: Apache-2.0
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
@@ -19,3 +23,7 @@ repos:
     rev: 3.7.9
     hooks:
     - id: flake8
+-   repo: https://github.com/fsfe/reuse-tool
+    rev: latest
+    hooks:
+    - id: reuse

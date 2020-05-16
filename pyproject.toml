@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2019 The usbmon-tools Authors
+# SPDX-License-Identifier: Apache-2.0
+
 [build-system]
 requires = [
   'setuptools >= 42',

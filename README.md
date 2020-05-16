@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2019 The usbmon-tools Authors
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 <p align="center">
 <a href="https://travis-ci.com/Flameeyes/usbmon-tools/builds/"><img alt="build status" src="https://travis-ci.com/Flameeyes/usbmon-tools.svg?branch=master"></a>
 <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-green"></a>
