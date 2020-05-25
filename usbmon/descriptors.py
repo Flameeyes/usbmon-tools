@@ -105,6 +105,7 @@ def search_device_descriptor(pair: packet.PacketPair,) -> Optional[DeviceDescrip
 
     if (
         not callback
+        or not submit
         or not submit.setup_packet
         or not submit.setup_packet.recipient == setup.Recipient.DEVICE
         or not submit.setup_packet.standard_request
