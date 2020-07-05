@@ -4,11 +4,13 @@
 
 *.egg-info/
 *.pyc
+*.so
 *~
 .cache
 .ipynb_checkpoints/
 .mypy_cache/
 /MANIFEST
 /dist/
+/usbmon/linux/linux.c
 __pycache__/
 build

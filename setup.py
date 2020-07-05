@@ -3,12 +3,21 @@
 # SPDX-FileCopyrightText: © 2019 The usbmon-tools Authors
 # SPDX-License-Identifier: Apache-2.0
 
-from setuptools import setup
+import sys
+
+from setuptools import Extension, setup
 
 # Ensure it's present.
 import setuptools_scm  # noqa: F401
+from Cython.Build import cythonize
+
+configured_extensions = []
+
+if sys.platform == "linux":
+    configured_extensions.append(Extension("usbmon.linux", ["usbmon/linux/linux.pyx"]))
 
 setup(
+    ext_modules=cythonize(configured_extensions),
     entry_points={
         "console_scripts": [
             "usbmon-capture_stats=usbmon.tools.capture_stats:main",

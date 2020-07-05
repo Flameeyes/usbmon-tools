@@ -19,7 +19,7 @@
 
 import datetime
 import errno
-from typing import Union
+from typing import Optional, Union
 
 import construct
 import hexdump
@@ -65,7 +65,9 @@ def _usbmon_structure(endianness):
 
 
 class UsbmonMmapPacket(packet.Packet):
-    def __init__(self, endianness: str, raw_packet: bytes):
+    def __init__(
+        self, endianness: str, raw_packet: bytes, payload: Optional[bytes] = None
+    ):
         super().__init__()
         constructed_object = _usbmon_structure(endianness).parse(raw_packet)
 
@@ -113,7 +115,14 @@ class UsbmonMmapPacket(packet.Packet):
         self.payload = constructed_object.payload
         self.epnum = constructed_object.epnum
 
-        assert constructed_object.len_cap == len(self.payload)
+        if payload is not None:
+            assert not constructed_object.payload
+            self.payload = payload
+
+        if constructed_object.len_cap != len(self.payload):
+            raise ValueError(
+                f"Capped length ({constructed_object.len_cap}) does not match payload length ({len(self.payload)})"
+            )
 
     @property
     def error(self) -> Union[str, int, None]:

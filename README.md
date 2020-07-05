@@ -22,6 +22,11 @@ In addition to the `usbmon` module, containing the data structures to access USB
 captures, this package contains a few scripts in the `tools/` directory, which
 can be used to manipulate usbmon captures.
 
+## Linux USB Capture Module
+
+A Cython module `usbmon.linux` will be built on Linux-based systems, that implements the
+binary API for USB Monitoring in Linux.
+
 ## Development
 
 You can see <CONTRIBUTING.md> for the details on contributing to this project.
