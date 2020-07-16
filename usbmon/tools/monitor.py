@@ -8,6 +8,8 @@
 import argparse
 import sys
 
+import pcapng
+
 import usbmon.linux
 from usbmon.capture.usbmon_mmap import UsbmonMmapPacket
 
@@ -31,9 +33,16 @@ def main():
     )
 
     parser.add_argument(
+        "--pcap-output",
+        action="store",
+        type=argparse.FileType("wb"),
+        help="Path to the file to write the pcapng output to. If not provided, the text output will be provided at stdout.",
+    )
+
+    parser.add_argument(
         "usbmon_device",
         action="store",
-        type=str,
+        type=argparse.FileType("rb"),
         help="Path to the usbmon device to capture from.",
     )
 
@@ -41,11 +50,30 @@ def main():
 
     endianness = ">" if sys.byteorder == "big" else "<"
 
-    with open(args.usbmon_device, "r") as usbmon_dev:
-        for raw_packet, payload in usbmon.linux.monitor(usbmon_dev):
-            packet = UsbmonMmapPacket(endianness, raw_packet, payload)
-            if packet.address.startswith(args.addr_prefix):
-                print(packet)
+    if args.pcap_output:
+        shb = pcapng.blocks.SectionHeader()
+        shb.new_member(
+            pcapng.blocks.InterfaceDescription,
+            link_type=pcapng.constants.link_types.LINKTYPE_USB_LINUX_MMAPPED,
+        )
+
+        pcap_writer = pcapng.FileWriter(args.pcap_output, shb)
+
+        def _packet_callback(packet):
+            new_packet = shb.new_member(pcapng.blocks.EnhancedPacket)
+            new_packet.interface_id = 0
+            new_packet.packet_data = packet.as_bytes()
+            pcap_writer.write_block(new_packet)
+
+    else:
+
+        def _packet_callback(packet):
+            print(packet)
+
+    for raw_packet, payload in usbmon.linux.monitor(args.usbmon_device):
+        packet = UsbmonMmapPacket(endianness, raw_packet, payload)
+        if packet.address.startswith(args.addr_prefix):
+            _packet_callback(packet)
 
 
 if __name__ == "__main__":

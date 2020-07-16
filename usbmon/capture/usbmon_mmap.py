@@ -69,6 +69,8 @@ class UsbmonMmapPacket(packet.Packet):
         self, endianness: str, raw_packet: bytes, payload: Optional[bytes] = None
     ):
         super().__init__()
+        self._raw_packet = raw_packet
+
         constructed_object = _usbmon_structure(endianness).parse(raw_packet)
 
         # The binary ID value is usually a pointer in memory. Keep the text
@@ -162,3 +164,10 @@ class UsbmonMmapPacket(packet.Packet):
             f"{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} "
             f"{self.setup_packet_string} {self.length} {self.flag_data} {payload_string}"
         ).rstrip()
+
+    def as_bytes(self) -> bytes:
+        packet_bytes = self._raw_packet
+        if self.payload:
+            packet_bytes += self.payload
+
+        return packet_bytes
