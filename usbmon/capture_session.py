@@ -21,7 +21,6 @@
 import datetime
 import itertools
 import logging
-import uuid
 from typing import Dict, Generator, List, Mapping, Optional
 
 from usbmon import constants, descriptors, packet
@@ -34,10 +33,11 @@ class Session:
         """Initialize the capture session.
 
         Args:
-          retag_urbs: Whether to replace URB tags with new UUIDs.
+          retag_urbs: Whether to replace URB tags with sequence numbers.
         """
         self._packet_pairs: List[packet.PacketPair] = []
-        self._submitted_packets: Dict[str, packet.Packet] = {}
+        self._submitted_packets: Dict[int, packet.Packet] = {}
+        self._next_tag = 0
         self._retag_urbs: bool = retag_urbs
 
         self._device_descriptors: Optional[
@@ -46,10 +46,12 @@ class Session:
 
     def _append(self, first: packet.Packet, second: Optional[packet.Packet]) -> None:
         if self._retag_urbs:
-            # Totally random UUID, is more useful than the original URB ID.  We
-            # take the hex string format, because that complies with the usbmon
-            # documentation, without risking parsing errors due to dashes.
-            tag = uuid.uuid4().hex
+            # The original URB IDs are not as unique as they should be. Instead, we
+            # apply an incremental sequence number. This allows for unique package
+            # identification, while maintaining compatibility with the usbmon binary
+            # format, that expects a 64-bit value maximum.
+            tag = self._next_tag
+            self._next_tag += 1
             first.tag = tag
             if second is not None:
                 second.tag = tag

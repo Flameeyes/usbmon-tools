@@ -36,7 +36,7 @@ _XFERTYPE_TO_MNEMONIC = {
 
 class Packet(abc.ABC):
 
-    tag: str
+    tag: int
     type: constants.PacketType
     xfer_type: constants.XferType
     devnum: int

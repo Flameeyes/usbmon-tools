@@ -71,10 +71,7 @@ class UsbmonMmapPacket(packet.Packet):
         super().__init__()
         constructed_object = _usbmon_structure(endianness).parse(raw_packet)
 
-        # The binary ID value is usually a pointer in memory. Keep the text
-        # representation instead, because it should be considered an opaque
-        # value.
-        self.tag = f"{constructed_object.id:08x}"
+        self.tag = constructed_object.id
 
         self.type = constructed_object.type
 
@@ -158,7 +155,7 @@ class UsbmonMmapPacket(packet.Packet):
         payload_string = hexdump.dump(self.payload, size=8).lower()
 
         return (
-            f"{self.tag} {self.timestamp.timestamp() * 1e6:.0f} "
+            f"{self.tag:016x} {self.timestamp.timestamp() * 1e6:.0f} "
             f"{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} "
             f"{self.setup_packet_string} {self.length} {self.flag_data} {payload_string}"
         ).rstrip()

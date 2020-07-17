@@ -73,10 +73,7 @@ class UsbpcapPacket(packet.Packet):
 
         constructed_object = _STRUCT.parse(block.packet_data)
 
-        # The binary ID value is usually a pointer in memory. Keep the text
-        # representation instead, because it should be considered an opaque
-        # value.
-        self.tag = f"{constructed_object.id:08x}"
+        self.tag = constructed_object.id
 
         # This appears to be an approximation.
         if constructed_object.info == 0x01:
@@ -136,7 +133,7 @@ class UsbpcapPacket(packet.Packet):
             payload_string = "?"
 
         return (
-            f"{self.tag} {self.timestamp.timestamp() * 1e6:.0f} "
+            f"{self.tag:016x} {self.timestamp.timestamp() * 1e6:.0f} "
             f"{self.type.value} {self.type_mnemonic}{self.direction.value}:{self.busnum}:{self.devnum:03d}:{self.endpoint} "
             f"{self.setup_packet_string} {self.length} {payload_string}"
         ).rstrip()
