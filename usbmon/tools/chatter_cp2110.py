@@ -17,11 +17,11 @@
 # SPDX-FileCopyrightText: © 2019 The usbmon-tools Authors
 # SPDX-License-Identifier: Apache-2.0
 
-import argparse
 import logging
 import sys
-from typing import Optional
+from typing import BinaryIO, Optional
 
+import click
 import usbmon
 import usbmon.chatter
 import usbmon.pcapng
@@ -47,34 +47,23 @@ def print_uart_config_packet(packet):
     print(" ".join(string_pieces))
 
 
-def main():
+@click.command()
+@click.option(
+    "--cp2110-address", help="USB address of the CP2110 device to extract chatter of."
+)
+@click.argument(
+    "pcap-file", type=click.File(mode="rb"), required=True,
+)
+def main(*, cp2110_address: str, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
-
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--cp2110_addr",
-        action="store",
-        type=str,
-        help="USB address of the CP2110 device to extract chatter of.",
-    )
-
-    parser.add_argument(
-        "pcap_file",
-        action="store",
-        type=str,
-        help="Path to the pcapng file with the USB capture.",
-    )
-
-    args = parser.parse_args()
 
     direction: Optional[usbmon.constants.Direction] = None
     reconstructed_packet: bytes = b""
 
-    session = usbmon.pcapng.parse_file(args.pcap_file, retag_urbs=True)
+    session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
 
-    if not args.cp2110_addr:
+    if not cp2110_address:
         # If there's no cp2110_addr flag on the command line, we can search for
         # the device in the session's descriptors (if it's there at all.)  Note
         # that this is not foolproof, because the CP2110 devices can be set to
@@ -88,10 +77,10 @@ def main():
                 # device, with no address. Exclude those.
                 not descriptor.address.endswith(".0")
             ):
-                args.cp2110_addr = descriptor.address
+                cp2110_address = descriptor.address
 
-    if not args.cp2110_addr:
-        raise parser.error("Unable to identify a CP2110 device descriptor.")
+    if not cp2110_address:
+        raise click.UsageError("Unable to identify a CP2110 device descriptor.")
 
     for pair in session.in_pairs():
         submission = usbmon.packet.get_submission(pair)
@@ -104,7 +93,7 @@ def main():
             logging.debug("Ignoring singleton packet: %s" % pair[0].tag)
             continue
 
-        if not submission.address.startswith(args.cp2110_addr):
+        if not submission.address.startswith(cp2110_address):
             # No need to check second, they will be linked.
             continue
 

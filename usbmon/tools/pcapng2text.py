@@ -34,59 +34,43 @@ with a few notable changes:
    constrained to 32-bit range.
 """
 
-import argparse
 import sys
+from typing import BinaryIO
 
+import click
 import usbmon.pcapng
 
 
-def main():
+@click.command()
+@click.option(
+    "--address-prefix",
+    help=(
+        "Prefix match applied to the device address in text format. "
+        "Only packets with source or destination matching this prefix "
+        "will be printed out."
+    ),
+    required=True,
+)
+@click.option(
+    "--retag-urbs / --no-retag-urbs",
+    help=(
+        "Apply new, unique tags to the URBs when converting to text "
+        "format. This works around the lack of unique keys in the "
+        "captures."
+    ),
+    default=True,
+    show_default=True,
+)
+@click.argument(
+    "pcap-file", type=click.File(mode="rb"), required=True,
+)
+def main(*, address_prefix: str, retag_urbs: bool, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--addr_prefix",
-        action="store",
-        type=str,
-        default="",
-        help=(
-            "Prefix match applied to the device address in text format. "
-            "Only packets with source or destination matching this prefix "
-            "will be printed out."
-        ),
-    )
-
-    parser.add_argument(
-        "--retag_urbs",
-        action="store_true",
-        dest="retag_urbs",
-        help=(
-            "Apply new, unique tags to the URBs when converting to text "
-            "format. This works around the lack of unique keys in the "
-            "captures."
-        ),
-    )
-    parser.add_argument(
-        "--noretag_urbs",
-        action="store_false",
-        dest="retag_urbs",
-        help="Keep original URB tags on the capture.",
-    )
-
-    parser.add_argument(
-        "pcap_file",
-        action="store",
-        type=str,
-        help="Path to the pcapng file with the USB capture.",
-    )
-
-    args = parser.parse_args()
-
-    session = usbmon.pcapng.parse_file(args.pcap_file, args.retag_urbs)
+    session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=retag_urbs)
     for packet in session:
-        if not packet.address.startswith(args.addr_prefix):
+        if not packet.address.startswith(address_prefix):
             continue
         print(str(packet))
 

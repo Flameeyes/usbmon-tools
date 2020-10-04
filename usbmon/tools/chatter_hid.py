@@ -17,10 +17,11 @@
 # SPDX-FileCopyrightText: © 2019 The usbmon-tools Authors
 # SPDX-License-Identifier: Apache-2.0
 
-import argparse
 import logging
 import sys
+from typing import BinaryIO
 
+import click
 import usbmon
 import usbmon.chatter
 import usbmon.constants
@@ -32,34 +33,24 @@ HID_XFER_TYPES = (
 )
 
 
-def main():
+@click.command()
+@click.option(
+    "--address-prefix",
+    help=(
+        "Prefix match applied to the device address in text format. "
+        "Only packets with source or destination matching this prefix "
+        "will be printed out."
+    ),
+    required=True,
+)
+@click.argument(
+    "pcap-file", type=click.File(mode="rb"), required=True,
+)
+def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--addr_prefix",
-        action="store",
-        type=str,
-        required=True,
-        help=(
-            "Prefix match applied to the device address in text format. "
-            "Only packets with source or destination matching this prefix "
-            "will be printed out."
-        ),
-    )
-
-    parser.add_argument(
-        "pcap_file",
-        action="store",
-        type=str,
-        help="Path to the pcapng file with the USB capture.",
-    )
-
-    args = parser.parse_args()
-
-    session = usbmon.pcapng.parse_file(args.pcap_file, retag_urbs=True)
+    session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
     for pair in session.in_pairs():
         submission = usbmon.packet.get_submission(pair)
         callback = usbmon.packet.get_callback(pair)
@@ -71,7 +62,7 @@ def main():
             logging.debug("Ignoring singleton packet: %s" % pair[0].tag)
             continue
 
-        if not submission.address.startswith(args.addr_prefix):
+        if not submission.address.startswith(address_prefix):
             # No need to check second, they will be linked.
             continue
 

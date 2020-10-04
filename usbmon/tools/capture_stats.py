@@ -16,33 +16,27 @@
 # SPDX-FileCopyrightText: © 2019 The usbmon-tools Authors
 # SPDX-License-Identifier: Apache-2.0
 
-import argparse
 import collections
 import sys
+from typing import BinaryIO
 
+import click
 import usbmon.pcapng
 
 
-def main():
+@click.command()
+@click.argument(
+    "pcap-file", type=click.File(mode="rb"), required=True,
+)
+def main(*, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
-
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "pcap_file",
-        action="store",
-        type=str,
-        help="Path to the pcapng file with the USB capture.",
-    )
-
-    args = parser.parse_args()
 
     direction_counter = collections.Counter()
     addresses_counter = collections.Counter()
     xfer_type_counter = collections.Counter()
 
-    session = usbmon.pcapng.parse_file(args.pcap_file, retag_urbs=True)
+    session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
 
     for packet in session:
         direction_counter[packet.direction] += 1
