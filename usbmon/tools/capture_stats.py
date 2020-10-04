@@ -18,9 +18,10 @@
 
 import collections
 import sys
-from typing import BinaryIO
+from typing import BinaryIO, MutableMapping
 
 import click
+import usbmon
 import usbmon.pcapng
 
 
@@ -32,9 +33,13 @@ def main(*, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
-    direction_counter = collections.Counter()
-    addresses_counter = collections.Counter()
-    xfer_type_counter = collections.Counter()
+    direction_counter: MutableMapping[
+        usbmon.constants.Direction, int
+    ] = collections.Counter()
+    addresses_counter: MutableMapping[str, int] = collections.Counter()
+    xfer_type_counter: MutableMapping[
+        usbmon.constants.XferType, int
+    ] = collections.Counter()
 
     session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
 
@@ -53,16 +58,16 @@ def main(*, pcap_file: BinaryIO) -> None:
 
     print("Packet Counters:")
     print(" Per direction:")
-    for key, count in direction_counter.items():
-        print(f"  {key!s}: {count}")
+    for direction, count in direction_counter.items():
+        print(f"  {direction!s}: {count}")
 
     print(" Per address:")
-    for key, count in addresses_counter.items():
-        print(f"  {key!s}: {count}")
+    for address, count in addresses_counter.items():
+        print(f"  {address!s}: {count}")
 
     print(" Per transfer type:")
-    for key, count in xfer_type_counter.items():
-        print(f"  {key!s}: {count}")
+    for xfertype, count in xfer_type_counter.items():
+        print(f"  {xfertype!s}: {count}")
 
 
 if __name__ == "__main__":

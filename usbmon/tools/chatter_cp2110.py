@@ -99,6 +99,7 @@ def main(*, cp2110_address: str, pcap_file: BinaryIO) -> None:
 
         if submission.xfer_type == usbmon.constants.XferType.INTERRUPT:
             if submission.direction != direction and reconstructed_packet:
+                assert direction is not None
                 print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
                 direction = None
                 reconstructed_packet = b""
@@ -124,6 +125,7 @@ def main(*, cp2110_address: str, pcap_file: BinaryIO) -> None:
                 if callback.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
                     print_uart_config_packet(callback)
 
+    assert direction is not None
     print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
 
 
