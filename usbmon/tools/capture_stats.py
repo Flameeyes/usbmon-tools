@@ -27,12 +27,21 @@ import usbmon.pcapng
 
 
 @click.command()
+@click.option(
+    "--address-prefix",
+    help=(
+        "Prefix match applied to the device address in text format. "
+        "Only packets with source or destination matching this prefix "
+        "will be printed out."
+    ),
+    required=True,
+)
 @click.argument(
     "pcap-file",
     type=click.File(mode="rb"),
     required=True,
 )
-def main(*, pcap_file: BinaryIO) -> None:
+def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
@@ -47,6 +56,9 @@ def main(*, pcap_file: BinaryIO) -> None:
     session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
 
     for packet in session:
+        if not packet.address.startswith(address_prefix):
+            continue
+
         direction_counter[packet.direction] += 1
         addresses_counter[packet.address] += 1
         xfer_type_counter[packet.xfer_type] += 1
