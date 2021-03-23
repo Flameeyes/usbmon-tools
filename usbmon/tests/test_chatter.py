@@ -44,7 +44,9 @@ class DumpBytesTest(absltest.TestCase):
     def test_print_empty(self):
         self.assertEqual(
             usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.OUT, b"", print_empty=True,
+                usbmon.constants.Direction.OUT,
+                b"",
+                print_empty=True,
             ),
             "H>>D 00000000:",
         )
@@ -52,7 +54,9 @@ class DumpBytesTest(absltest.TestCase):
     def test_custom_prefix(self):
         self.assertEqual(
             usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.IN, b"\x01\x02\x03", prefix="pfx",
+                usbmon.constants.Direction.IN,
+                b"\x01\x02\x03",
+                prefix="pfx",
             ),
             "pfx H<<D 00000000: 01 02 03                                          ...",
         )
@@ -60,7 +64,10 @@ class DumpBytesTest(absltest.TestCase):
     def test_custom_prefix_empty(self):
         self.assertEqual(
             usbmon.chatter.dump_bytes(
-                usbmon.constants.Direction.OUT, b"", prefix="pfx", print_empty=True,
+                usbmon.constants.Direction.OUT,
+                b"",
+                prefix="pfx",
+                print_empty=True,
             ),
             "pfx H>>D 00000000:",
         )

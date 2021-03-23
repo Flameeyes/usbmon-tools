@@ -103,7 +103,8 @@ class Session:
     def in_order(self) -> Generator[packet.Packet, None, None]:
         """Yield the packets in their timestamp order."""
         yield from sorted(
-            filter(None, itertools.chain(*self.in_pairs())), key=lambda x: x.timestamp,
+            filter(None, itertools.chain(*self.in_pairs())),
+            key=lambda x: x.timestamp,
         )
 
     def __iter__(self) -> Generator[packet.Packet, None, None]:

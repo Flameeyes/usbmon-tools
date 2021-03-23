@@ -22,6 +22,7 @@ import sys
 from typing import BinaryIO, Optional
 
 import click
+
 import usbmon
 import usbmon.chatter
 import usbmon.pcapng
@@ -52,7 +53,9 @@ def print_uart_config_packet(packet):
     "--cp2110-address", help="USB address of the CP2110 device to extract chatter of."
 )
 @click.argument(
-    "pcap-file", type=click.File(mode="rb"), required=True,
+    "pcap-file",
+    type=click.File(mode="rb"),
+    required=True,
 )
 def main(*, cp2110_address: str, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):

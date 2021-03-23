@@ -21,13 +21,16 @@ import sys
 from typing import BinaryIO, MutableMapping
 
 import click
+
 import usbmon
 import usbmon.pcapng
 
 
 @click.command()
 @click.argument(
-    "pcap-file", type=click.File(mode="rb"), required=True,
+    "pcap-file",
+    type=click.File(mode="rb"),
+    required=True,
 )
 def main(*, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):

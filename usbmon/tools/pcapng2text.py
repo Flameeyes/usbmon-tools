@@ -38,6 +38,7 @@ import sys
 from typing import BinaryIO
 
 import click
+
 import usbmon.pcapng
 
 
@@ -62,7 +63,9 @@ import usbmon.pcapng
     show_default=True,
 )
 @click.argument(
-    "pcap-file", type=click.File(mode="rb"), required=True,
+    "pcap-file",
+    type=click.File(mode="rb"),
+    required=True,
 )
 def main(*, address_prefix: str, retag_urbs: bool, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):

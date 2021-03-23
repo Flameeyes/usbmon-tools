@@ -22,6 +22,7 @@ import sys
 from typing import BinaryIO
 
 import click
+
 import usbmon
 import usbmon.chatter
 import usbmon.constants
@@ -44,7 +45,9 @@ HID_XFER_TYPES = (
     required=True,
 )
 @click.argument(
-    "pcap-file", type=click.File(mode="rb"), required=True,
+    "pcap-file",
+    type=click.File(mode="rb"),
+    required=True,
 )
 def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):

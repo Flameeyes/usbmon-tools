@@ -99,7 +99,9 @@ class DeviceDescriptor:
         )
 
 
-def search_device_descriptor(pair: packet.PacketPair,) -> Optional[DeviceDescriptor]:
+def search_device_descriptor(
+    pair: packet.PacketPair,
+) -> Optional[DeviceDescriptor]:
     submit = packet.get_submission(pair)
     callback = packet.get_callback(pair)
 
