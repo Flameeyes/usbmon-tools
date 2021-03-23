@@ -9,8 +9,10 @@
 .cache
 .ipynb_checkpoints/
 .mypy_cache/
+.vscode/
 /MANIFEST
 /dist/
 /usbmon/linux/linux.c
+/venv/
 __pycache__/
 build
