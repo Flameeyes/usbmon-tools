@@ -67,7 +67,7 @@ def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
 
     print(" Devices")
     for address, descriptor in session.device_descriptors.items():
-        print(f"   {address}: {descriptor!r}")
+        print(f"   {address}: {descriptor}")
 
     print()
 
