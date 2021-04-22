@@ -92,11 +92,11 @@ class DeviceDescriptor:
     def num_configurations(self) -> int:
         return self._parsed.bNumConfigurations
 
+    def __str__(self) -> str:
+        return f"{self.vendor_id:04x}:{self.product_id:04x}"
+
     def __repr__(self) -> str:
-        return (
-            f"<usbmon.descriptors.DeviceDescriptor "
-            f"{self.vendor_id:04x}:{self.product_id:04x}>"
-        )
+        return f"<usbmon.descriptors.DeviceDescriptor {self!s}>"
 
 
 def search_device_descriptor(
