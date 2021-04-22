@@ -34,7 +34,7 @@ import usbmon.pcapng
         "Only packets with source or destination matching this prefix "
         "will be printed out."
     ),
-    required=True,
+    default="",
 )
 @click.argument(
     "pcap-file",
