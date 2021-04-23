@@ -18,13 +18,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import datetime
-import errno
 from typing import Optional, Union
 
 import construct
 import hexdump
 
 from usbmon import constants, packet, setup
+
+_ERRORCODE_MAP = {-2: "ENOENT", -115: "EINPROGRESS"}
 
 
 def _usbmon_structure(endianness):
@@ -126,7 +127,7 @@ class UsbmonMmapPacket(packet.Packet):
         """Returns a standard errno symbol for error status."""
         if self.status < 0:
             try:
-                return errno.errorcode[abs(self.status)]
+                return _ERRORCODE_MAP[self.status]
             except LookupError:
                 return self.status
         else:
