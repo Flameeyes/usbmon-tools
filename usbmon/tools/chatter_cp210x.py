@@ -40,12 +40,21 @@ CP210X_XFER_TYPES = (
     "--device-address",
     help="USB address of the CP210x device to extract the chatter of.",
 )
+@click.option(
+    "--all-controls / --no-all-controls",
+    "-a",
+    default=False,
+    help=(
+        "If enabled, decode and print all the control requests. Otherwise only the"
+        " wire setup control commands will be printed."
+    ),
+)
 @click.argument(
     "pcap-file",
     type=click.File(mode="rb"),
     required=True,
 )
-def main(*, device_address: str, pcap_file: BinaryIO) -> None:
+def main(*, device_address: str, all_controls: bool, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
@@ -89,28 +98,27 @@ def main(*, device_address: str, pcap_file: BinaryIO) -> None:
             continue
 
         if submission.xfer_type == usbmon.constants.XferType.BULK:
-            pass
-        elif (
-            submission.xfer_type == usbmon.constants.XferType.CONTROL
-            and submission.setup_packet
-            and submission.setup_packet.type == usbmon.setup.Type.CLASS
-        ):
-            pass
-        else:
-            continue
+            if submission.direction != direction and reconstructed_packet:
+                assert direction is not None
+                print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
+                print()
+                direction = None
+                reconstructed_packet = b""
 
-        if submission.direction != direction and reconstructed_packet:
-            assert direction is not None
-            print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
-            print()
-            direction = None
-            reconstructed_packet = b""
-
-        direction = submission.direction
-        if direction == usbmon.constants.Direction.OUT:
-            reconstructed_packet += submission.payload
-        else:
-            reconstructed_packet += callback.payload
+            direction = submission.direction
+            if direction == usbmon.constants.Direction.OUT:
+                reconstructed_packet += submission.payload
+            else:
+                reconstructed_packet += callback.payload
+        elif submission.xfer_type == usbmon.constants.XferType.CONTROL:
+            try:
+                request, argument = cp210x.control_command(submission, callback)
+            except ValueError:
+                continue
+            else:
+                if not all_controls and request not in cp210x.WIRE_SETUPS_COMMANDS:
+                    continue
+                print(cp210x.control_command_to_str(request, argument))
 
     assert direction is not None
     print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
