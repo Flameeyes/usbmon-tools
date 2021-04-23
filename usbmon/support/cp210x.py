@@ -167,7 +167,7 @@ def control_command(
         baudrate = construct.Int32ul.parse(callback.payload)
         return (request, baudrate)
     elif request == Request.SET_LINE_CTL:
-        ctl = LineCtl.from_word(submission.setup_packet.value)
+        ctl = LineCtl.from_word(setup_packet.value)
         return (request, ctl)
     elif request == Request.GET_LINE_CTL:
         assert len(callback.payload) == 2
