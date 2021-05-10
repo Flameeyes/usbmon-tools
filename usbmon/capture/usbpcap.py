@@ -36,6 +36,27 @@ class ControlStage(enum.IntEnum):
     COMPLETE = 3
 
 
+# usbpcap reuses the transfer field for two extra conditions:
+#  - IRP information (on error such as stalled pipes);
+#  - Unknown IRPs.
+# We map them together but then reject them as we don't have use for them,
+# at least for now.
+
+
+@enum.unique
+class UsbcapXferType(enum.IntEnum):
+    IRP_INFO = 0xFE
+    UNKNOWN = 0xFF
+
+
+_USBPCAP_XFER_TYPE_MAPPING = {e: e.value for e in UsbcapXferType}
+_USBPCAP_XFER_TYPE_MAPPING.update({e: e.value for e in constants.XferType})
+
+
+class UnsupportedCaptureData(ValueError):
+    """Raised when an unsupported capture data struct is being parsed."""
+
+
 _STRUCT = construct.Struct(
     headerLen=construct.Int16ul,
     id=construct.Int64ul,
@@ -45,9 +66,7 @@ _STRUCT = construct.Struct(
     busnum=construct.Int16ul,
     devnum=construct.Int16ul,
     epnum=construct.Byte,
-    xfer_type=construct.Mapping(
-        construct.Byte, {e: e.value for e in constants.XferType}
-    ),
+    xfer_type=construct.Mapping(construct.Byte, _USBPCAP_XFER_TYPE_MAPPING),
     dataLength=construct.Int32ul,
     # Start of additional headers.
     control_header=construct.If(
@@ -72,6 +91,11 @@ class UsbpcapPacket(packet.Packet):
         self.timestamp = datetime.datetime.fromtimestamp(block.timestamp)
 
         constructed_object = _STRUCT.parse(block.packet_data)
+
+        if not isinstance(constructed_object.xfer_type, constants.XferType):
+            raise UnsupportedCaptureData(
+                f"Unable to parse capture data of type {constructed_object.xfer_type!r}"
+            )
 
         self.tag = constructed_object.id
 

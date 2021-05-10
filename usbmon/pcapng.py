@@ -93,7 +93,10 @@ def parse_stream(stream: BinaryIO, retag_urbs: bool = True) -> capture_session.S
                     endianness, block.packet_data
                 )
             elif link_type == 249:
-                parsed_packet = usbpcap.UsbpcapPacket(block)
+                try:
+                    parsed_packet = usbpcap.UsbpcapPacket(block)
+                except usbpcap.UnsupportedCaptureData:
+                    pass
 
             assert parsed_packet is not None
             session.add(parsed_packet)
