@@ -20,6 +20,7 @@
 import datetime
 import enum
 import logging
+from typing import Dict, Union
 
 import construct
 import hexdump
@@ -49,7 +50,9 @@ class UsbcapXferType(enum.IntEnum):
     UNKNOWN = 0xFF
 
 
-_USBPCAP_XFER_TYPE_MAPPING = {e: e.value for e in UsbcapXferType}
+_USBPCAP_XFER_TYPE_MAPPING: Dict[Union[UsbcapXferType, constants.XferType], int] = {
+    e: e.value for e in UsbcapXferType
+}
 _USBPCAP_XFER_TYPE_MAPPING.update({e: e.value for e in constants.XferType})
 
 
