@@ -64,9 +64,9 @@ def main(*, device_address: str, all_controls: bool, pcap_file: BinaryIO) -> int
     session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
 
     if not device_address:
-        # If there's no cp2110_addr flag on the command line, we can search for
+        # If there's no --device-address flag on the command line, we can search for
         # the device in the session's descriptors (if it's there at all.)  Note
-        # that this is not foolproof, because the CP2110 devices can be set to
+        # that this is not foolproof, because the CP210x devices can be set to
         # have their own custom VID/PID pairs.
         for descriptor in session.device_descriptors.values():
             if (

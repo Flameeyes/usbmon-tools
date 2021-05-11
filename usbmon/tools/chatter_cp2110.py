@@ -50,14 +50,15 @@ def print_uart_config_packet(packet):
 
 @click.command()
 @click.option(
-    "--cp2110-address", help="USB address of the CP2110 device to extract chatter of."
+    "--device-address",
+    help="USB address of the CP2110 device to extract chatter of.",
 )
 @click.argument(
     "pcap-file",
     type=click.File(mode="rb"),
     required=True,
 )
-def main(*, cp2110_address: str, pcap_file: BinaryIO) -> int:
+def main(*, device_address: str, pcap_file: BinaryIO) -> int:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
@@ -66,8 +67,8 @@ def main(*, cp2110_address: str, pcap_file: BinaryIO) -> int:
 
     session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
 
-    if not cp2110_address:
-        # If there's no cp2110_addr flag on the command line, we can search for
+    if not device_address:
+        # If there's no --device-address flag on the command line, we can search for
         # the device in the session's descriptors (if it's there at all.)  Note
         # that this is not foolproof, because the CP2110 devices can be set to
         # have their own custom VID/PID pairs.
@@ -80,9 +81,9 @@ def main(*, cp2110_address: str, pcap_file: BinaryIO) -> int:
                 # device, with no address. Exclude those.
                 not descriptor.address.endswith(".0")
             ):
-                cp2110_address = descriptor.address
+                device_address = descriptor.address
 
-    if not cp2110_address:
+    if not device_address:
         raise click.UsageError("Unable to identify a CP2110 device descriptor.")
 
     for pair in session.in_pairs():
@@ -96,7 +97,7 @@ def main(*, cp2110_address: str, pcap_file: BinaryIO) -> int:
             logging.debug("Ignoring singleton packet: %s" % pair[0].tag)
             continue
 
-        if not submission.address.startswith(cp2110_address):
+        if not submission.address.startswith(device_address):
             # No need to check second, they will be linked.
             continue
 
