@@ -56,7 +56,6 @@ class StopBits(enum.IntEnum):
 
 
 UART_CONFIG_STRUCT = construct.Struct(
-    report_id=construct.Const(b"\x50"),
     baudrate=construct.Int32ub,
     parity=construct.Enum(construct.Byte, Parity),
     flow_control=construct.Enum(construct.Byte, FlowControl),

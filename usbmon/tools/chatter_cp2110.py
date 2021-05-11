@@ -27,13 +27,14 @@ import usbmon
 import usbmon.addresses
 import usbmon.chatter
 import usbmon.pcapng
+import usbmon.support.hid
 from usbmon.support import cp2110
 
 from . import _utils
 
 
-def print_uart_config_packet(packet):
-    uart_config = cp2110.UART_CONFIG_STRUCT.parse(packet.payload)
+def print_uart_config_packet(packet: usbmon.support.hid.HIDPacket):
+    uart_config = cp2110.UART_CONFIG_STRUCT.parse(packet.report_content)
 
     if packet.direction == usbmon.constants.Direction.OUT:
         command = "SET UART CONFIG"
@@ -92,48 +93,24 @@ def main(
     if not device_address:
         raise click.UsageError("Unable to identify a CP2110 device descriptor.")
 
-    for pair in session.in_pairs():
-        submission = usbmon.packet.get_submission(pair)
-        callback = usbmon.packet.get_callback(pair)
+    for packet in usbmon.support.hid.select(session, device_address=device_address):
 
-        if not submission or not callback:
-            # We don't care which one is missing, we can just get the first
-            # packet's tag. If there's an ERROR packet, it'll also behave as we
-            # want it to.
-            logging.debug("Ignoring singleton packet: %s" % pair[0].tag)
-            continue
-
-        if submission.address.device_address != device_address:
-            # No need to check second, they will be linked.
-            continue
-
-        if submission.xfer_type == usbmon.constants.XferType.INTERRUPT:
-            if submission.direction != direction and reconstructed_packet:
+        if packet.urb.xfer_type == usbmon.constants.XferType.INTERRUPT:
+            if packet.direction != direction and reconstructed_packet:
                 assert direction is not None
                 print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
                 direction = None
                 reconstructed_packet = b""
 
-            direction = submission.direction
-            if direction == usbmon.constants.Direction.OUT:
-                payload = submission.payload
+            direction = packet.urb.direction
+
+            if 0 <= packet.report_id <= 0x3F:
+                reconstructed_packet += packet.report_content
             else:
-                payload = callback.payload
-
-            if payload:
-                report = payload[0]
-
-                if 0 <= report <= 0x3F:
-                    reconstructed_packet += payload[1:]
-                else:
-                    print("Report: %2x" % report)
-        elif submission.xfer_type == usbmon.constants.XferType.CONTROL:
-            if submission.payload:
-                if submission.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
-                    print_uart_config_packet(submission)
-            if callback.payload:
-                if callback.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
-                    print_uart_config_packet(callback)
+                print(f"Report: {packet.report_id:02x}")
+        elif packet.urb.xfer_type == usbmon.constants.XferType.CONTROL:
+            if packet.report_id == cp2110.ReportId.GET_SET_UART_CONFIG.value:
+                print_uart_config_packet(packet)
 
     if direction is None:
         logging.error("No matching CP2110 transaction found.")
