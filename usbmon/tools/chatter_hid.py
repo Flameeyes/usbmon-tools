@@ -36,12 +36,8 @@ HID_XFER_TYPES = (
 
 @click.command()
 @click.option(
-    "--address-prefix",
-    help=(
-        "Prefix match applied to the device address in text format. "
-        "Only packets with source or destination matching this prefix "
-        "will be printed out."
-    ),
+    "--device-address",
+    help="USB address of the HID device to extract chatter of.",
     required=True,
 )
 @click.argument(
@@ -49,7 +45,7 @@ HID_XFER_TYPES = (
     type=click.File(mode="rb"),
     required=True,
 )
-def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
+def main(*, device_address: str, pcap_file: BinaryIO) -> None:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
@@ -65,7 +61,7 @@ def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
             logging.debug("Ignoring singleton packet: %s" % pair[0].tag)
             continue
 
-        if not submission.address.startswith(address_prefix):
+        if not submission.address == device_address:
             # No need to check second, they will be linked.
             continue
 
