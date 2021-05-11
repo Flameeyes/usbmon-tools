@@ -21,7 +21,7 @@ import abc
 import datetime
 from typing import Optional, Tuple
 
-from usbmon import constants, setup
+from usbmon import addresses, constants, setup
 
 PacketPair = Tuple["Packet", Optional["Packet"]]
 
@@ -62,8 +62,8 @@ class Packet(abc.ABC):
             return constants.Direction.OUT
 
     @property
-    def address(self) -> str:
-        return f"{self.busnum}.{self.devnum}.{self.endpoint}"
+    def address(self) -> addresses.EndpointAddress:
+        return addresses.EndpointAddress(self.busnum, self.devnum, self.endpoint)
 
     @property
     def type_mnemonic(self) -> str:

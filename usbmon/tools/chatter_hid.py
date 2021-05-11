@@ -23,14 +23,18 @@ from typing import BinaryIO
 import click
 
 import usbmon
+import usbmon.addresses
 import usbmon.pcapng
 import usbmon.support.hid
+
+from . import _utils
 
 
 @click.command()
 @click.option(
     "--device-address",
     help="USB address of the HID device to extract chatter of.",
+    type=_utils.DeviceAddressType(),
     required=True,
 )
 @click.argument(
@@ -38,7 +42,9 @@ import usbmon.support.hid
     type=click.File(mode="rb"),
     required=True,
 )
-def main(*, device_address: str, pcap_file: BinaryIO) -> None:
+def main(
+    *, device_address: usbmon.addresses.DeviceAddress, pcap_file: BinaryIO
+) -> None:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 

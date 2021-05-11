@@ -73,7 +73,7 @@ def main(*, address_prefix: str, retag_urbs: bool, pcap_file: BinaryIO) -> None:
 
     session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=retag_urbs)
     for packet in session:
-        if not packet.address.startswith(address_prefix):
+        if not str(packet.address).startswith(address_prefix):
             continue
         print(str(packet))
 

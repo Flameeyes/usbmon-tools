@@ -22,6 +22,7 @@ import binascii
 
 from absl.testing import absltest
 
+import usbmon.addresses
 import usbmon.capture.usbmon_mmap
 import usbmon.descriptors
 
@@ -50,7 +51,7 @@ class DescriptorsTest(absltest.TestCase):
         descriptor = usbmon.descriptors.search_device_descriptor(packet_pair)
         self.assertIsNotNone(descriptor)
 
-        self.assertEqual(descriptor.address, "1.2")
+        self.assertEqual(descriptor.address, usbmon.addresses.DeviceAddress(1, 2))
         self.assertEqual(descriptor.language_id, 0)
         self.assertEqual(descriptor.index, 0)
 

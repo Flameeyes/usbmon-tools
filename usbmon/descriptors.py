@@ -23,7 +23,7 @@ from typing import Optional
 
 import construct
 
-from usbmon import packet, setup
+from usbmon import addresses, packet, setup
 
 _USB_DEVICE_DESCRIPTOR = construct.Struct(
     bLength=construct.Const(18, construct.Byte),
@@ -44,14 +44,20 @@ _USB_DEVICE_DESCRIPTOR = construct.Struct(
 
 
 class DeviceDescriptor:
-    def __init__(self, address: str, index: int, language_id: int, descriptor: bytes):
+    def __init__(
+        self,
+        address: addresses.DeviceAddress,
+        index: int,
+        language_id: int,
+        descriptor: bytes,
+    ):
         self._address = address
         self._index = index
         self._language_id = language_id
         self._parsed = _USB_DEVICE_DESCRIPTOR.parse(descriptor)
 
     @property
-    def address(self) -> str:
+    def address(self) -> addresses.DeviceAddress:
         return self._address
 
     @property
@@ -116,9 +122,7 @@ def search_device_descriptor(
     ):
         return None
 
-    # Notably, this is not the same as `submit.address` because it should not
-    # include the endpoint address for a device description.
-    device_address = f"{submit.busnum}.{submit.devnum}"
+    device_address = submit.address.device_address
 
     # Descriptor index and type are encoded in the wValue field.
     descriptor_index = submit.setup_packet.value & 0xFF

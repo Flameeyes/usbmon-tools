@@ -24,9 +24,12 @@ from typing import BinaryIO, Optional
 import click
 
 import usbmon
+import usbmon.addresses
 import usbmon.chatter
 import usbmon.pcapng
 from usbmon.support import cp2110
+
+from . import _utils
 
 
 def print_uart_config_packet(packet):
@@ -52,13 +55,16 @@ def print_uart_config_packet(packet):
 @click.option(
     "--device-address",
     help="USB address of the CP2110 device to extract chatter of.",
+    type=_utils.DeviceAddressType(),
 )
 @click.argument(
     "pcap-file",
     type=click.File(mode="rb"),
     required=True,
 )
-def main(*, device_address: str, pcap_file: BinaryIO) -> int:
+def main(
+    *, device_address: Optional[usbmon.addresses.DeviceAddress], pcap_file: BinaryIO
+) -> int:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
@@ -79,7 +85,7 @@ def main(*, device_address: str, pcap_file: BinaryIO) -> int:
                 and
                 # Sometimes there's a descriptor for a not-fully-initialized
                 # device, with no address. Exclude those.
-                not descriptor.address.endswith(".0")
+                not descriptor.address.device == 0
             ):
                 device_address = descriptor.address
 
@@ -97,7 +103,7 @@ def main(*, device_address: str, pcap_file: BinaryIO) -> int:
             logging.debug("Ignoring singleton packet: %s" % pair[0].tag)
             continue
 
-        if not submission.address.startswith(device_address):
+        if submission.address.device_address != device_address:
             # No need to check second, they will be linked.
             continue
 

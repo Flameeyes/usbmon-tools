@@ -21,6 +21,7 @@ import os
 
 from absl.testing import absltest
 
+import usbmon.addresses
 import usbmon.pcapng
 
 
@@ -37,5 +38,7 @@ class TestUsbpcap(absltest.TestCase):
         self.assertLen(session.device_descriptors, 1)
 
         (device_descriptor,) = session.device_descriptors.values()
-        self.assertEqual(device_descriptor.address, "1.1")
+        self.assertEqual(
+            device_descriptor.address, usbmon.addresses.DeviceAddress(1, 1)
+        )
         self.assertEqual(device_descriptor.vendor_id, 0x0627)

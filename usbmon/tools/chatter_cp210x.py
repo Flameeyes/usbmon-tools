@@ -24,10 +24,13 @@ from typing import BinaryIO, Optional
 import click
 
 import usbmon
+import usbmon.addresses
 import usbmon.chatter
 import usbmon.constants
 import usbmon.pcapng
 from usbmon.support import cp210x
+
+from . import _utils
 
 CP210X_XFER_TYPES = (
     usbmon.constants.XferType.BULK,
@@ -39,6 +42,7 @@ CP210X_XFER_TYPES = (
 @click.option(
     "--device-address",
     help="USB address of the CP210x device to extract the chatter of.",
+    type=_utils.DeviceAddressType(),
 )
 @click.option(
     "--all-controls / --no-all-controls",
@@ -54,7 +58,12 @@ CP210X_XFER_TYPES = (
     type=click.File(mode="rb"),
     required=True,
 )
-def main(*, device_address: str, all_controls: bool, pcap_file: BinaryIO) -> int:
+def main(
+    *,
+    device_address: Optional[usbmon.addresses.DeviceAddress],
+    all_controls: bool,
+    pcap_file: BinaryIO,
+) -> int:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
@@ -75,7 +84,7 @@ def main(*, device_address: str, all_controls: bool, pcap_file: BinaryIO) -> int
                 and
                 # Sometimes there's a descriptor for a not-fully-initialized
                 # device, with no address. Exclude those.
-                not descriptor.address.endswith(".0")
+                not descriptor.address.device == 0
             ):
                 device_address = descriptor.address
 
@@ -93,7 +102,7 @@ def main(*, device_address: str, all_controls: bool, pcap_file: BinaryIO) -> int
             logging.debug(f"Ignoring singleton packet: {pair[0].tag}")
             continue
 
-        if not submission.address.startswith(device_address):
+        if submission.address.device_address != device_address:
             # No need to check second, they will be linked.
             continue
 

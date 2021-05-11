@@ -20,6 +20,7 @@ import dataclasses
 import logging
 from typing import Iterator, Optional
 
+import usbmon.addresses
 import usbmon.capture_session
 import usbmon.chatter
 import usbmon.constants
@@ -60,7 +61,8 @@ def _is_possible_hid_submission(packet: usbmon.packet.Packet) -> bool:
 
 
 def select(
-    session: usbmon.capture_session.Session, device_address: Optional[str] = None
+    session: usbmon.capture_session.Session,
+    device_address: Optional[usbmon.addresses.DeviceAddress] = None,
 ) -> Iterator[HIDPacket]:
     """Extract packets pairs from a session that match the HID protocol.
 
@@ -78,7 +80,10 @@ def select(
             _LOGGER.debug("Ignoring singleton packet: {pair[0].tag}")
             continue
 
-        if device_address is not None and submission.address != device_address:
+        if (
+            device_address is not None
+            and submission.address.device_address != device_address
+        ):
             # No need to check second, they will be linked.
             continue
 

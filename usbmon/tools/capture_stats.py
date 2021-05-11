@@ -23,6 +23,7 @@ from typing import BinaryIO, MutableMapping
 import click
 
 import usbmon
+import usbmon.addresses
 import usbmon.pcapng
 
 
@@ -48,7 +49,9 @@ def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
     direction_counter: MutableMapping[
         usbmon.constants.Direction, int
     ] = collections.Counter()
-    addresses_counter: MutableMapping[str, int] = collections.Counter()
+    addresses_counter: MutableMapping[
+        usbmon.addresses.EndpointAddress, int
+    ] = collections.Counter()
     xfer_type_counter: MutableMapping[
         usbmon.constants.XferType, int
     ] = collections.Counter()
@@ -56,7 +59,7 @@ def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
     session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
 
     for packet in session:
-        if not packet.address.startswith(address_prefix):
+        if not str(packet.address).startswith(address_prefix):
             continue
 
         direction_counter[packet.direction] += 1
@@ -67,7 +70,7 @@ def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
 
     print(" Devices")
     for address, descriptor in session.device_descriptors.items():
-        if address.startswith(address_prefix):
+        if str(address).startswith(address_prefix):
             print(f"   {address}: {descriptor}")
 
     print()
@@ -78,8 +81,8 @@ def main(*, address_prefix: str, pcap_file: BinaryIO) -> None:
         print(f"  {direction!s}: {count}")
 
     print(" Per address:")
-    for address, count in addresses_counter.items():
-        print(f"  {address!s}: {count}")
+    for endpoint_address, count in addresses_counter.items():
+        print(f"  {endpoint_address!s}: {count}")
 
     print(" Per transfer type:")
     for xfertype, count in xfer_type_counter.items():

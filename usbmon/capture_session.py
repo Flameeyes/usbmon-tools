@@ -23,7 +23,7 @@ import itertools
 import logging
 from typing import Dict, Generator, List, Mapping, Optional
 
-from usbmon import constants, descriptors, packet
+from usbmon import addresses, constants, descriptors, packet
 
 _MAX_CALLBACK_ANTICIPATION = datetime.timedelta(seconds=0.2)
 
@@ -41,7 +41,7 @@ class Session:
         self._retag_urbs: bool = retag_urbs
 
         self._device_descriptors: Optional[
-            Dict[str, descriptors.DeviceDescriptor]
+            Dict[addresses.DeviceAddress, descriptors.DeviceDescriptor]
         ] = None
 
     def _append(self, first: packet.Packet, second: Optional[packet.Packet]) -> None:
@@ -111,7 +111,9 @@ class Session:
         return self.in_order()
 
     @property
-    def device_descriptors(self) -> Mapping[str, descriptors.DeviceDescriptor]:
+    def device_descriptors(
+        self,
+    ) -> Mapping[addresses.DeviceAddress, descriptors.DeviceDescriptor]:
         if self._device_descriptors is None:
             self._scan_for_descriptors()
         assert self._device_descriptors is not None
