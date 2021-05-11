@@ -57,7 +57,7 @@ def print_uart_config_packet(packet):
     type=click.File(mode="rb"),
     required=True,
 )
-def main(*, cp2110_address: str, pcap_file: BinaryIO) -> None:
+def main(*, cp2110_address: str, pcap_file: BinaryIO) -> int:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
@@ -128,8 +128,12 @@ def main(*, cp2110_address: str, pcap_file: BinaryIO) -> None:
                 if callback.payload[0] == cp2110.ReportId.GET_SET_UART_CONFIG.value:
                     print_uart_config_packet(callback)
 
-    assert direction is not None
+    if direction is None:
+        logging.error("No matching CP2110 transaction found.")
+        return 1
+
     print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
+    return 0
 
 
 if __name__ == "__main__":

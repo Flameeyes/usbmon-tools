@@ -54,7 +54,7 @@ CP210X_XFER_TYPES = (
     type=click.File(mode="rb"),
     required=True,
 )
-def main(*, device_address: str, all_controls: bool, pcap_file: BinaryIO) -> None:
+def main(*, device_address: str, all_controls: bool, pcap_file: BinaryIO) -> int:
     if sys.version_info < (3, 7):
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
@@ -120,8 +120,12 @@ def main(*, device_address: str, all_controls: bool, pcap_file: BinaryIO) -> Non
                     continue
                 print(cp210x.control_command_to_str(request, argument))
 
-    assert direction is not None
+    if direction is None:
+        logging.error("No matching CP210x transaction found.")
+        return 1
+
     print(usbmon.chatter.dump_bytes(direction, reconstructed_packet))
+    return 0
 
 
 if __name__ == "__main__":
