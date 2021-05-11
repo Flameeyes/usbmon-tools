@@ -17,21 +17,14 @@
 # SPDX-FileCopyrightText: © 2019 The usbmon-tools Authors
 # SPDX-License-Identifier: Apache-2.0
 
-import logging
 import sys
 from typing import BinaryIO
 
 import click
 
 import usbmon
-import usbmon.chatter
-import usbmon.constants
 import usbmon.pcapng
-
-HID_XFER_TYPES = (
-    usbmon.constants.XferType.INTERRUPT,
-    usbmon.constants.XferType.CONTROL,
-)
+import usbmon.support.hid
 
 
 @click.command()
@@ -50,39 +43,8 @@ def main(*, device_address: str, pcap_file: BinaryIO) -> None:
         raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
     session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
-    for pair in session.in_pairs():
-        submission = usbmon.packet.get_submission(pair)
-        callback = usbmon.packet.get_callback(pair)
-
-        if not submission or not callback:
-            # We don't care which one is missing, we can just get the first
-            # packet's tag. If there's an ERROR packet, it'll also behave as we
-            # want it to.
-            logging.debug("Ignoring singleton packet: %s" % pair[0].tag)
-            continue
-
-        if not submission.address == device_address:
-            # No need to check second, they will be linked.
-            continue
-
-        if submission.xfer_type == usbmon.constants.XferType.INTERRUPT:
-            pass
-        elif (
-            submission.xfer_type == usbmon.constants.XferType.CONTROL
-            and submission.setup_packet
-            and submission.setup_packet.type == usbmon.setup.Type.CLASS
-        ):
-            pass
-        else:
-            continue
-
-        if submission.direction == usbmon.constants.Direction.OUT:
-            dumped_packet = submission
-        else:
-            dumped_packet = callback
-
-        if dumped_packet.payload:
-            print(usbmon.chatter.dump_packet(dumped_packet), "\n")
+    for packet in usbmon.support.hid.select(session, device_address=device_address):
+        print(usbmon.support.hid.dump_packet(packet), "\n")
 
 
 if __name__ == "__main__":
