@@ -119,3 +119,22 @@ class Session:
         assert self._device_descriptors is not None
 
         return self._device_descriptors
+
+    def find_devices_by_ids(
+        self, vendor_id: int, product_id: Optional[int]
+    ) -> Iterator[addresses.DeviceAddress]:
+        """Look up in the descriptors table for a device matching the VID/PID provided.
+
+        If product_id is None, look up any device from the corresponding vendor.
+        """
+        for descriptor in self.device_descriptors.values():
+            # Sometimes there's a descriptor for a not-fully-initialized
+            # device, with no address. Exclude those.
+            if descriptor.address.device == 0:
+                continue
+
+            if descriptor.vendor_id != vendor_id:
+                continue
+
+            if product_id is None or descriptor.product_id == product_id:
+                yield descriptor.address

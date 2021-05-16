@@ -77,19 +77,21 @@ def main(
         # the device in the session's descriptors (if it's there at all.)  Note
         # that this is not foolproof, because the CP210x devices can be set to
         # have their own custom VID/PID pairs.
-        for descriptor in session.device_descriptors.values():
-            if (
-                descriptor.vendor_id == cp210x.DEFAULT_VENDOR_ID
-                and descriptor.product_id == cp210x.DEFAULT_PRODUCT_ID
-                and
-                # Sometimes there's a descriptor for a not-fully-initialized
-                # device, with no address. Exclude those.
-                not descriptor.address.device == 0
-            ):
-                device_address = descriptor.address
-
-    if not device_address:
-        raise click.UsageError("Unable to identify a CP210x device descriptor.")
+        possible_addresses = list(
+            session.find_devices_by_ids(
+                cp210x.DEFAULT_VENDOR_ID, cp210x.DEFAULT_PRODUCT_ID
+            )
+        )
+        if len(possible_addresses) > 1:
+            raise click.UsageError(
+                f"Multiple device addresses for CP210x found, please select one of {','.join(possible_addresses)}"
+            )
+        elif len(possible_addresses) == 0:
+            raise click.UsageError(
+                "No descriptor with the default CP210x ID pair found, please select an address."
+            )
+        else:
+            (device_address,) = possible_addresses
 
     for pair in session.in_pairs():
         submission = usbmon.packet.get_submission(pair)
