@@ -85,8 +85,11 @@ def main(
             )
         )
         if len(possible_addresses) > 1:
+            possible_addresses_str = ", ".join(
+                str(address) for address in possible_addresses
+            )
             raise click.UsageError(
-                f"Multiple device addresses for CP2110 found, please select one of {','.join(possible_addresses)}"
+                f"Multiple device addresses for CP2110 found, please select one of {possible_addresses_str}"
             )
         elif len(possible_addresses) == 0:
             raise click.UsageError(
