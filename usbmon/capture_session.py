@@ -21,7 +21,7 @@
 import datetime
 import itertools
 import logging
-from typing import Dict, Generator, List, Mapping, Optional
+from typing import Dict, Iterator, List, Mapping, Optional
 
 from usbmon import addresses, constants, descriptors, packet
 
@@ -88,7 +88,7 @@ class Session:
         else:
             self._submitted_packets[packet.tag] = packet
 
-    def in_pairs(self) -> Generator[packet.PacketPair, None, None]:
+    def in_pairs(self) -> Iterator[packet.PacketPair]:
         yield from self._packet_pairs
         for unmatched_packet in self._submitted_packets.values():
             yield (unmatched_packet, None)
@@ -100,14 +100,14 @@ class Session:
             if descriptor:
                 self._device_descriptors[descriptor.address] = descriptor
 
-    def in_order(self) -> Generator[packet.Packet, None, None]:
+    def in_order(self) -> Iterator[packet.Packet]:
         """Yield the packets in their timestamp order."""
         yield from sorted(
             filter(None, itertools.chain(*self.in_pairs())),
             key=lambda x: x.timestamp,
         )
 
-    def __iter__(self) -> Generator[packet.Packet, None, None]:
+    def __iter__(self) -> Iterator[packet.Packet]:
         return self.in_order()
 
     @property
