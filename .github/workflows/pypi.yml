@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-name: Publish to TestPyPI
+name: Publish to TestPyPI (and PyPI)
 
 on: push
 
