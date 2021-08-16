@@ -33,25 +33,6 @@ from usbmon.support import cp2110
 from . import _utils
 
 
-def print_uart_config_packet(packet: usbmon.support.hid.HIDPacket):
-    uart_config = cp2110.UART_CONFIG_STRUCT.parse(packet.report_content)
-
-    if packet.direction == usbmon.constants.Direction.OUT:
-        command = "SET UART CONFIG"
-    else:
-        command = "GET UART CONFIG"
-
-    string_pieces = [
-        f"{command}:",
-        f"baudrate={uart_config.baudrate}",
-        f"parity={uart_config.parity!s}",
-        f"flow_control={uart_config.flow_control!s}",
-        f"data_bits={uart_config.data_bits}",
-        f"stop_bits={uart_config.stop_bits}",
-    ]
-    print(" ".join(string_pieces))
-
-
 @click.command()
 @click.option(
     "--device-address",
@@ -114,8 +95,7 @@ def main(
             else:
                 print(f"Report: {packet.report_id:02x}")
         elif packet.urb.xfer_type == usbmon.constants.XferType.CONTROL:
-            if packet.report_id == cp2110.ReportId.GET_SET_UART_CONFIG.value:
-                print_uart_config_packet(packet)
+            print(cp2110.control_command_to_str(packet))
 
     if direction is None:
         logging.error("No matching CP2110 transaction found.")
