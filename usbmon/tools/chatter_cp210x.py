@@ -28,7 +28,7 @@ import usbmon.addresses
 import usbmon.chatter
 import usbmon.constants
 import usbmon.pcapng
-from usbmon.support import click_helpers, cp210x
+from usbmon.support import click_helpers, cp210x, extractors
 
 CP210X_XFER_TYPES = (
     usbmon.constants.XferType.BULK,
@@ -70,29 +70,15 @@ def main(
 
     session = usbmon.pcapng.parse_stream(pcap_file, retag_urbs=True)
 
-    if not device_address:
-        # If there's no --device-address flag on the command line, we can search for
-        # the device in the session's descriptors (if it's there at all.)  Note
-        # that this is not foolproof, because the CP210x devices can be set to
-        # have their own custom VID/PID pairs.
-        possible_addresses = list(
-            session.find_devices_by_ids(
-                cp210x.DEFAULT_VENDOR_ID, cp210x.DEFAULT_PRODUCT_ID
-            )
+    try:
+        device_address = extractors.find_device_in_session(
+            session,
+            device_address,
+            {(cp210x.DEFAULT_VENDOR_ID, cp210x.DEFAULT_PRODUCT_ID)},
+            device_name="CP210x adapter",
         )
-        if len(possible_addresses) > 1:
-            possible_addresses_str = ", ".join(
-                str(address) for address in possible_addresses
-            )
-            raise click.UsageError(
-                f"Multiple device addresses for CP210x found, please select one of {possible_addresses_str}"
-            )
-        elif len(possible_addresses) == 0:
-            raise click.UsageError(
-                "No descriptor with the default CP210x ID pair found, please select an address."
-            )
-        else:
-            (device_address,) = possible_addresses
+    except extractors.DeviceSearchError as e:
+        raise click.UsageError(str(e)) from e
 
     for pair in session.in_pairs():
         submission = usbmon.packet.get_submission(pair)
