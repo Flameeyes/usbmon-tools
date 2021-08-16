@@ -28,9 +28,7 @@ import usbmon.addresses
 import usbmon.chatter
 import usbmon.constants
 import usbmon.pcapng
-from usbmon.support import cp210x
-
-from . import _utils
+from usbmon.support import click_helpers, cp210x
 
 CP210X_XFER_TYPES = (
     usbmon.constants.XferType.BULK,
@@ -42,7 +40,7 @@ CP210X_XFER_TYPES = (
 @click.option(
     "--device-address",
     help="USB address of the CP210x device to extract the chatter of.",
-    type=_utils.DeviceAddressType(),
+    type=click_helpers.DeviceAddressType(),
 )
 @click.option(
     "--all-controls / --no-all-controls",

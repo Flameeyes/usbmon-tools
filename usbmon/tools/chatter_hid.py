@@ -26,15 +26,14 @@ import usbmon
 import usbmon.addresses
 import usbmon.pcapng
 import usbmon.support.hid
-
-from . import _utils
+from usbmon.support import click_helpers
 
 
 @click.command()
 @click.option(
     "--device-address",
     help="USB address of the HID device to extract chatter of.",
-    type=_utils.DeviceAddressType(),
+    type=click_helpers.DeviceAddressType(),
     required=True,
 )
 @click.argument(

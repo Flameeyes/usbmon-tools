@@ -28,16 +28,14 @@ import usbmon.addresses
 import usbmon.chatter
 import usbmon.pcapng
 import usbmon.support.hid
-from usbmon.support import cp2110
-
-from . import _utils
+from usbmon.support import click_helpers, cp2110
 
 
 @click.command()
 @click.option(
     "--device-address",
     help="USB address of the CP2110 device to extract chatter of.",
-    type=_utils.DeviceAddressType(),
+    type=click_helpers.DeviceAddressType(),
 )
 @click.argument(
     "pcap-file",
