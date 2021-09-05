@@ -5,7 +5,6 @@
 requires = [
   'setuptools >= 42',
   'wheel',
-  'Cython',
   'setuptools_scm[toml]>=4.0',
 ]
 
