@@ -178,6 +178,6 @@ _REPORTS_TO_CLASSES = {
 def control_command_to_str(packet: usbmon.support.hid.HIDPacket) -> str:
     try:
         report_id = ReportId(packet.report_id)
-        return str(_REPORTS_TO_CLASSES[report_id].from_packet(packet))
+        return str(_REPORTS_TO_CLASSES[report_id].from_packet(packet))  # type: ignore
     except (ValueError, KeyError):
         return f"REPORT_ID={packet.report_id:02x} PAYLOAD={packet.report_content.hex()}"
