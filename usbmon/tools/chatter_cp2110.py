@@ -64,7 +64,6 @@ def main(
         raise click.UsageError(str(e)) from e
 
     for packet in usbmon.support.hid.select(session, device_address=device_address):
-
         if packet.urb.xfer_type == usbmon.constants.XferType.INTERRUPT:
             if packet.direction != direction and reconstructed_packet:
                 assert direction is not None
